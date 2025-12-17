@@ -22,6 +22,52 @@ class InfiniteDataLoader:
         return len(self.dataloader)
 
 
+def entropy_meaning_loss(logits, pseudo_labels, mask_ratio):
+    """
+    logits: (N, C) - Flattened logits from strong augmentation
+    pseudo_labels: (N) - Hard pseudo labels
+    mask_ratio: Boolean mask of pixels that passed the threshold
+    """
+    logits_masked = logits[mask_ratio]
+    if logits_masked.shape[0] == 0:
+        return torch.tensor(0.0).to(logits.device)
+    
+    pseudo_labels_masked = pseudo_labels[mask_ratio]
+    num_classes = logits.shape[1]
+
+    probs = torch.softmax(logits_masked, dim=1)
+    
+    targets = torch.zeros_like(probs).scatter_(1, pseudo_labels_masked.unsqueeze(1), 1)
+    
+    non_target_probs = probs * (1 - targets)
+    
+    loss = -torch.log(1 - non_target_probs + 1e-7)
+    
+    return loss.sum(dim=1).mean()
+
+
+def adaptive_negative_learning_loss(logits_strong, logits_weak, threshold_k=0.75):
+    """
+    logits_strong: (N, C)
+    logits_weak: (N, C)
+    threshold_k: Float (0 to 1). Percentage of classes to treat as negative.
+                 e.g. 0.75 means the bottom 75% of classes are negative.
+    """
+    probs_weak = torch.softmax(logits_weak.detach(), dim=1)
+    probs_strong = torch.softmax(logits_strong, dim=1)
+    
+    num_classes = logits_weak.shape[1]
+    k = int(num_classes * threshold_k) 
+    
+    _, negative_indices = torch.topk(probs_weak, k, dim=1, largest=False)
+    
+    negative_probs_strong = torch.gather(probs_strong, 1, negative_indices)
+    
+    loss = -torch.log(1 - negative_probs_strong + 1e-7)
+    
+    return loss.mean()
+
+
 def count_params(model):
     param_num = sum(p.numel() for p in model.parameters())
     return param_num / 1e6

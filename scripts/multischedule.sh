@@ -3,7 +3,7 @@
 method="$1"
 now=$(date +"%Y%m%d_%H%M%S")
 exp='r101'
-datasets=('lower')
+datasets=('lahore' 'karachi' 'mumbai' 'lower' 'medellin' 'makoko' 'eldaein' 'elgeneina')
 
 if [ "$method" == "supervised" ]; then
     for dataset in "${datasets[@]}"; do
@@ -15,7 +15,7 @@ if [ "$method" == "supervised" ]; then
     done
 elif [ "$method" == "fixmatch" ] || [ "$method" == "unimatch" ]; then
     for dataset in "${datasets[@]}"; do
-        for split in 10 20 30; do
+        for split in 10; do
             config="configs/${dataset}.yaml"
             labeled_id_path="splits/${dataset}/${split}/labeled.txt"
             unlabeled_id_path="splits/${dataset}/${split}/unlabeled.txt"
@@ -26,7 +26,7 @@ elif [ "$method" == "fixmatch" ] || [ "$method" == "unimatch" ]; then
     done
 elif [ "$method" == "unimatchv2" ]; then
     for dataset in "${datasets[@]}"; do
-        for split in 10 20 30; do
+        for split in 10; do
             config="configs/${dataset}_dino.yaml"
             labeled_id_path="splits/${dataset}/${split}/labeled.txt"
             unlabeled_id_path="splits/${dataset}/${split}/unlabeled.txt"

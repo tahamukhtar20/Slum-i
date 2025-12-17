@@ -59,7 +59,7 @@ def main():
 
     criterion_l = nn.CrossEntropyLoss(ignore_index=255).cuda(local_rank)
 
-    criterion_u = nn.CrossEntropyLoss(ignore_index=255).cuda(local_rank)
+    criterion_u = nn.CrossEntropyLoss(ignore_index=255, reduction='none').cuda(local_rank)
 
     trainset_u = SemiDataset(cfg['dataset'], cfg['data_root'], 'train_u',
                              cfg['crop_size'], args.unlabeled_id_path)
