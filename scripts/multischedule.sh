@@ -1,52 +1,62 @@
 #!/bin/bash
 
 method="$1"
+run_all_splits="$2"
 now=$(date +"%Y%m%d_%H%M%S")
 exp='r101'
 datasets=('lahore' 'karachi' 'mumbai' 'lower' 'medellin' 'makoko' 'eldaein' 'elgeneina')
+splits=(10 20 30)
 
-if [ "$method" == "supervised" ]; then
-    for dataset in "${datasets[@]}"; do
-        config="configs/${dataset}.yaml"
-        labeled_id_path="splits/${dataset}/train.txt"
-        save_path="exp/${dataset}/${method}/${exp}"
-        mkdir -p "$save_path"
-        sbatch scripts/train_slurm.sh "$method" "$config" "$labeled_id_path" "$save_path" "$now"
-    done
-elif [ "$method" == "fixmatch" ] || [ "$method" == "unimatch" ]; then
-    for dataset in "${datasets[@]}"; do
-        for split in 10; do
-            config="configs/${dataset}.yaml"
+case "$method" in
+    supervised|supervised-dino)
+        is_semi=false
+        [[ "$method" == *"dino"* ]] && config_prefix="configs/dino/benchmark" || config_prefix="configs/deeplab/benchmark"
+        ;;
+    fixmatch|unimatch|ours)
+        is_semi=true
+        [[ "$method" == "ours" ]] && config_prefix="configs/deeplab/ours" || config_prefix="configs/deeplab/benchmark"
+        ;;
+    unimatchv2|ours-dino)
+        is_semi=true
+        [[ "$method" == "ours-dino" ]] && config_prefix="configs/dino/ours" || config_prefix="configs/dino/benchmark"
+        ;;
+    *)
+        echo "Error: Unknown method: $method"
+        exit 1
+        ;;
+esac
+
+for dataset in "${datasets[@]}"; do
+    config="${config_prefix}/${dataset}.yaml"
+    if [[ "$is_semi" == true ]]; then
+        for split in "${splits[@]}"; do
             labeled_id_path="splits/${dataset}/${split}/labeled.txt"
             unlabeled_id_path="splits/${dataset}/${split}/unlabeled.txt"
             save_path="exp/${dataset}/${method}/${exp}/${split}"
+
+            [[ ! -f "$labeled_id_path" ]] && echo "Missing $labeled_id_path, skipping." && continue
+
             mkdir -p "$save_path"
             sbatch scripts/train_slurm.sh "$method" "$config" "$labeled_id_path" "$unlabeled_id_path" "$save_path" "$now" "$split"
         done
-    done
-elif [ "$method" == "unimatchv2" ]; then
-    for dataset in "${datasets[@]}"; do
-        for split in 10; do
-            config="configs/${dataset}_dino.yaml"
-            labeled_id_path="splits/${dataset}/${split}/labeled.txt"
-            unlabeled_id_path="splits/${dataset}/${split}/unlabeled.txt"
+    else
+        if [[ "$run_all_splits" == "y" ]]; then
+            for split in "${splits[@]}"; do
+                labeled_id_path="splits/${dataset}/${split}/labeled.txt"
+                save_path="exp/${dataset}/${method}/${exp}/${split}"
+
+                [[ ! -f "$labeled_id_path" ]] && echo "Missing $labeled_id_path, skipping." && continue
+
+                mkdir -p "$save_path"
+                sbatch scripts/train_slurm.sh "$method" "$config" "$labeled_id_path" "$save_path" "$now" "$split"
+            done
+        else
+            split="full"
+            labeled_id_path="splits/${dataset}/train.txt"
             save_path="exp/${dataset}/${method}/${exp}/${split}"
+
             mkdir -p "$save_path"
-            sbatch scripts/train_slurm.sh "$method" "$config" "$labeled_id_path" "$unlabeled_id_path" "$save_path" "$now" "$split"
-        done
-    done
-elif [ "$method" == "ours" ]; then
-    for dataset in "${datasets[@]}"; do
-        for split in 10; do
-            config="configs/${dataset}_ours.yaml"
-            labeled_id_path="splits/${dataset}/${split}/labeled.txt"
-            unlabeled_id_path="splits/${dataset}/${split}/unlabeled.txt"
-            save_path="exp/${dataset}/${method}/${exp}/${split}"
-            mkdir -p "$save_path"
-            sbatch scripts/train_slurm.sh "$method" "$config" "$labeled_id_path" "$unlabeled_id_path" "$save_path" "$now" "$split"
-        done
-    done
-else
-    echo "Unknown method: $method"
-    exit 1
-fi
+            sbatch scripts/train_slurm.sh "$method" "$config" "$labeled_id_path" "$save_path" "$now" "$split"
+        fi
+    fi
+done

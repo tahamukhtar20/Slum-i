@@ -2,10 +2,11 @@
 now=$(date +"%Y%m%d_%H%M%S")
 
 # modify these augments if you want to try other datasets, splits or methods
-# dataset: ['pascal', 'cityscapes', 'coco']
-# method: ['unimatch', 'fixmatch', 'supervised']
+# dataset: ['eldaein', 'elgeneina', 'lower', 'makoko', 'medellin', 'mumbai', 'karachi', 'lahore']
+# method: ['unimatchv2' 'unimatch', 'fixmatch', 'supervised']
 # exp: just for specifying the 'save_path'
-# split: ['92', '1_16', 'u2pl_1_16', ...]. Please check directory './splits/$dataset' for concrete splits
+# split: ['10', '20', '30']. Please check directory './splits/$dataset' for concrete splits
+
 dataset='lower'
 method='fixmatch'
 exp='r101'

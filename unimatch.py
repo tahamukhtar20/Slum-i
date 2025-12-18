@@ -14,7 +14,7 @@ import yaml
 
 from dataset.semi import SemiDataset
 from model.semseg.deeplabv3plus import DeepLabV3Plus
-from supervised import evaluate
+from supervised import evaluate, test
 from util.utils import init_log, AverageMeter
 
 from thop import profile
@@ -36,7 +36,6 @@ def main():
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
 
-    rank = 0
     world_size = 1
     local_rank = 0
 
@@ -90,18 +89,7 @@ def main():
     previous_best_iou = 0.0
     epoch = -1
     
-    total_time_ms = AverageMeter()
-    
     total_start_time = time.time()
-    
-    # if os.path.exists(os.path.join(args.save_path, 'latest.pth')):
-    #     checkpoint = torch.load(os.path.join(args.save_path, 'latest.pth'))
-    #     model.load_state_dict(checkpoint['model'])
-    #     optimizer.load_state_dict(checkpoint['optimizer'])
-    #     epoch = checkpoint['epoch']
-    #     previous_best_iou = checkpoint['previous_best_iou']
-        
-    #     logger.info('************ Load from checkpoint at epoch %i\n' % epoch)
     
     for epoch in range(epoch + 1, cfg['epochs']):
         logger.info('===========> Epoch: {:}, LR: {:.5f}, Previous best IoU: {:.2f}'.format(
@@ -115,15 +103,10 @@ def main():
 
         loader = zip(trainloader_l, trainloader_u, trainloader_u)
 
-        start_event = torch.cuda.Event(enable_timing=True)
-        end_event = torch.cuda.Event(enable_timing=True)
-
         for i, ((img_x, mask_x),
                 (img_u_w, img_u_s1, img_u_s2, ignore_mask, cutmix_box1, cutmix_box2),
                 (img_u_w_mix, img_u_s1_mix, img_u_s2_mix, ignore_mask_mix, _, _)) in enumerate(loader):
             
-            start_event.record()
-
             img_x, mask_x = img_x.cuda(), mask_x.cuda()
             img_u_w = img_u_w.cuda()
             img_u_s1, img_u_s2, ignore_mask = img_u_s1.cuda(), img_u_s2.cuda(), ignore_mask.cuda()
@@ -191,12 +174,6 @@ def main():
             loss.backward()
             optimizer.step()
             
-            end_event.record()
-            torch.cuda.synchronize()
-            iter_time_ms = start_event.elapsed_time(end_event)
-
-            total_time_ms.update(iter_time_ms)
-
             total_loss.update(loss.item())
             total_loss_x.update(loss_x.item())
             total_loss_s.update((loss_u_s1.item() + loss_u_s2.item()) / 2.0)
@@ -211,7 +188,6 @@ def main():
             optimizer.param_groups[0]["lr"] = lr
             optimizer.param_groups[1]["lr"] = lr * cfg['lr_multi']
             
-            writer.add_scalar('train/time_ms', iter_time_ms, iters)
             writer.add_scalar('train/loss_all', loss.item(), iters)
             writer.add_scalar('train/loss_x', loss_x.item(), iters)
             writer.add_scalar('train/loss_s', (loss_u_s1.item() + loss_u_s2.item()) / 2.0, iters)
@@ -225,12 +201,8 @@ def main():
                         
             if i % log_frequency == 0:
                 logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Mask ratio: '
-                            '{:.3f}, Time/Iter: {:.2f}ms'.format(i, total_loss.avg, total_loss_x.avg, 
-                                            total_loss_s.avg, total_mask_ratio.avg, total_time_ms.avg))
+                            '{:.3f}'.format(i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_mask_ratio.avg))
         
-        logger.info('Epoch Time Summary: Average iteration time: {:.2f}ms'.format(total_time_ms.avg))
-        total_time_ms.reset()
-
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg)
 
         logger.info('***** Evaluation ***** >>>> Background IoU: {:.2f}'.format(iou_class[0]))
@@ -263,35 +235,7 @@ def main():
     total_end_time = time.time()
     total_training_seconds = total_end_time - total_start_time
 
-    testset = SemiDataset(cfg['dataset'], cfg['data_root'], 'test')
-    testloader = DataLoader(testset, batch_size=1, pin_memory=True, num_workers=1, drop_last=False)
-    
-    checkpoint = torch.load(os.path.join(args.save_path, 'best.pth'))    
-    model.load_state_dict(checkpoint['model'])
-    iou_class, macro_iou, overall_acc, avg_inference_ms = evaluate(model, testloader, cfg, calculate_speed=True)
-    logger.info('************ Final Test Results ************')
-    logger.info('***** Test ***** >>>> Background IoU: {:.2f}'.format(iou_class[0]))
-    logger.info('***** Test ***** >>>> Foreground IoU: {:.2f}'.format(iou_class[1]))
-    logger.info('***** Test ***** >>>> Macro IoU (Main Metric): {:.2f}'.format(macro_iou))
-    logger.info('***** Test ***** >>>> Overall Accuracy: {:.2f}\n'.format(overall_acc))
-
-    os.makedirs(os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], 'unimatch', args.split), exist_ok=True)
-    results_path = os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], 'unimatch', args.split, 'results.txt')
-
-    with open(results_path, 'w') as f:
-            f.write('Background IoU: {:.2f}\n'.format(iou_class[0]))
-            f.write('Foreground IoU: {:.2f}\n'.format(iou_class[1]))
-            f.write('Macro IoU (Main Metric): {:.2f}\n'.format(macro_iou))
-            f.write('Overall Accuracy: {:.2f}\n'.format(overall_acc))
-            f.write('---\n')
-            f.write('COMPUTATIONAL METRICS\n')
-            f.write('Total Parameters: {:.1f}M\n'.format(model_params_m))
-            f.write('Inference FLOPs: {:.2f}G\n'.format(model_flops_g))
-            f.write('Avg. Inference Time (1x{}x{}): {:.2f}ms (Throughput: {:.1f} FPS)\n'.format(
-                H, W, avg_inference_ms, 1000 / avg_inference_ms if avg_inference_ms > 0 else 0))
-            f.write('Total Training Time: {:.2f} hours\n'.format(total_training_seconds / 3600))
-
-    logger.info('Test results saved to {}'.format(results_path)) 
+    test(args, cfg, model, logger, "unimatch", split=args.split, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
 
 if __name__ == '__main__':
     main()

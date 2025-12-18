@@ -1,18 +1,25 @@
 #!/bin/bash
-#SBATCH -p B200,H100,H200,H200-SDS,A100-80GB
+#SBATCH -p RTXA6000
 #SBATCH --job-name=training
 #SBATCH --gpus=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=256G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
+#SBATCH --time=08:00:00
 #SBATCH --container-image=/enroot/nvcr.io_nvidia_pytorch_25.02-py3.sqsh
 #SBATCH --container-workdir=/netscratch/mukhtar/UniMatch
 #SBATCH --container-mounts=/netscratch:/netscratch,/netscratch/mukhtar/UniMatch:/netscratch/mukhtar/UniMatch
 #SBATCH --output=logs/slurm-%j.out
 
-method="$1"
+if [ "$#" -lt 6 ]; then
+    echo "Error: Expected at least 6 arguments, got $#"
+    exit 1
+fi
 
-if [ "$method" == "supervised" ]; then
-    scripts/exec.sh "$1" "$2" "$3" "" "$4" "$5"
-else
+if [ "$#" -eq 6 ]; then
+    scripts/exec.sh "$1" "$2" "$3" "" "$4" "$5" "$6"
+elif [ "$#" -eq 7 ]; then
     scripts/exec.sh "$1" "$2" "$3" "$4" "$5" "$6" "$7"
+else
+    echo "Error: Unexpected number of arguments ($#). Expected 6 or 7."
+    exit 1
 fi

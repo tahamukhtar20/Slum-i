@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import pprint
+import time
 
 import math
 import torch
@@ -15,8 +16,9 @@ import yaml
 
 from dataset.semi import SemiDataset
 from model.semseg.deeplabv3plus import DeepLabV3Plus
-from util.utils import count_params, AverageMeter, intersectionAndUnion, init_log
+from util.utils import init_log, AverageMeter, intersectionAndUnion
 
+from thop import profile
 
 parser = argparse.ArgumentParser(description='Semi-Supervised Semantic Segmentation for Slum Detection')
 parser.add_argument('--config', type=str, required=True)
@@ -24,6 +26,7 @@ parser.add_argument('--labeled-id-path', type=str, required=True)
 parser.add_argument('--unlabeled-id-path', type=str, default=None)
 parser.add_argument('--save-path', type=str, required=True)
 parser.add_argument('--results-dir', type=str, default='./results')
+parser.add_argument('--split', type=str, default='full')
 
 
 def evaluate(model, loader, cfg, calculate_speed=False, multiplier=None):
@@ -89,13 +92,18 @@ def evaluate(model, loader, cfg, calculate_speed=False, multiplier=None):
     return iou_class, macro_iou, overall_acc
 
 
-def test(args, cfg, model, logger, method, split=None, suffix='', multiplier=None):
+def test(args, cfg, model, logger, method, split=None, suffix='', multiplier=None, calculate_speed=False, total_training_seconds=0, model_flops_g=0.0, model_params_m=0.0, H=0, W=0):
+    avg_inference_ms = 0.0
+    
     testset = SemiDataset(cfg['dataset'], cfg['data_root'], 'test')
     testloader = DataLoader(testset, batch_size=1, pin_memory=True, num_workers=1,
                             drop_last=False)
     checkpoint = torch.load(os.path.join(args.save_path, 'best.pth'), weights_only=False)    
     model.load_state_dict(checkpoint['model'])
-    iou_class, macro_iou, overall_acc = evaluate(model, testloader, cfg, multiplier=multiplier)
+    if calculate_speed:
+        iou_class, macro_iou, overall_acc, avg_inference_ms = evaluate(model, testloader, cfg, multiplier=multiplier, calculate_speed=calculate_speed)
+    else:
+        iou_class, macro_iou, overall_acc = evaluate(model, testloader, cfg, multiplier=multiplier, calculate_speed=calculate_speed)
 
     logger.info('************ Final Test Results ************')
     logger.info('***** Test ***** >>>> Background IoU: {:.2f}'.format(iou_class[0]))
@@ -103,18 +111,22 @@ def test(args, cfg, model, logger, method, split=None, suffix='', multiplier=Non
     logger.info('***** Test ***** >>>> Macro IoU (Main Metric): {:.2f}'.format(macro_iou))
     logger.info('***** Test ***** >>>> Overall Accuracy: {:.2f}\n'.format(overall_acc))
     
-    if split is not None:    
-        os.makedirs(os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], method, split), exist_ok=True)
-        results_path = os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], method, split, 'results{suffix}.txt'.format(suffix=suffix))
-    else:
-        os.makedirs(os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], method), exist_ok=True)
-        results_path = os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], method, 'results{suffix}.txt'.format(suffix=suffix))
+    os.makedirs(os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], method, split), exist_ok=True)
+    results_path = os.path.join(args.results_dir, cfg['model'], cfg['backbone'], cfg['dataset'], method, split, 'results{suffix}.txt'.format(suffix=suffix))
 
     with open(results_path, 'w') as f:
-        f.write('method, background_iou, foreground_iou, macro_iou, overall_acc\n')
-        f.write('{},{:.2f},{:.2f},{:.2f},{:.2f}\n'.format(method, iou_class[0], iou_class[1], macro_iou, overall_acc))
-        f.write('\n')
-
+            f.write('Background IoU: {:.2f}\n'.format(iou_class[0]))
+            f.write('Foreground IoU: {:.2f}\n'.format(iou_class[1]))
+            f.write('Macro IoU (Main Metric): {:.2f}\n'.format(macro_iou))
+            f.write('Overall Accuracy: {:.2f}\n'.format(overall_acc))
+            f.write('---\n')
+            f.write('COMPUTATIONAL METRICS\n')
+            f.write('Total Parameters: {:.1f}M\n'.format(model_params_m))
+            f.write('Inference FLOPs: {:.2f}G\n'.format(model_flops_g))
+            f.write('Avg. Inference Time (1x{}x{}): {:.2f}ms (Throughput: {:.1f} FPS)\n'.format(
+                H, W, avg_inference_ms, 1000 / avg_inference_ms if avg_inference_ms > 0 else 0))
+            f.write('Total Training Time: {:.2f} hours\n'.format(total_training_seconds / 3600))
+    
     logger.info('Test results saved to {}'.format(results_path)) 
 
 
@@ -126,7 +138,6 @@ def main():
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
 
-    rank = 0
     world_size = 1
     local_rank = 0
 
@@ -141,13 +152,22 @@ def main():
     cudnn.benchmark = True
 
     model = DeepLabV3Plus(cfg)
-    logger.info('Total params: {:.1f}M\n'.format(count_params(model)))
-
+    
+    C, H, W = 3, cfg['crop_size'], cfg['crop_size']
+    dummy_input = torch.randn(1, C, H, W).cuda(local_rank)
+    model.cuda(local_rank)
+    
+    flops, params = profile(model, inputs=(dummy_input,), verbose=False, custom_ops={})
+    
+    model_flops_g = flops / 1e9
+    model_params_m = params / 1e6
+    
+    logger.info('Total params (thop): {:.1f}M'.format(model_params_m))
+    logger.info('Inference FLOPs (thop): {:.2f}G on size {}x{}'.format(model_flops_g, H, W))
+    
     optimizer = SGD([{'params': model.backbone.parameters(), 'lr': cfg['lr']},
                      {'params': [param for name, param in model.named_parameters() if 'backbone' not in name],
                       'lr': cfg['lr'] * cfg['lr_multi']}], lr=cfg['lr'], momentum=0.9, weight_decay=1e-4)
-
-    model.cuda(local_rank)
 
     criterion = nn.CrossEntropyLoss(ignore_index=255).cuda(local_rank)
 
@@ -163,17 +183,9 @@ def main():
     total_iters = len(trainloader) * cfg['epochs']
     previous_best_iou, previous_best_acc = 0.0, 0.0
     epoch = -1
-
-    # if os.path.exists(os.path.join(args.save_path, 'latest.pth')):
-    #     checkpoint = torch.load(os.path.join(args.save_path, 'latest.pth'), weights_only=False)
-    #     model.load_state_dict(checkpoint['model'])
-    #     optimizer.load_state_dict(checkpoint['optimizer'])
-    #     epoch = checkpoint['epoch']
-    #     previous_best_iou = checkpoint['previous_best_iou']
-    #     previous_best_acc = checkpoint['previous_best_acc']
-        
-    #     logger.info('************ Load from checkpoint at epoch %i\n' % epoch)
     
+    total_start_time = time.time()
+
     for epoch in range(epoch + 1, cfg['epochs']):
         logger.info('===========> Epoch: {:}, LR: {:.5f}, Previous best Macro IoU: {:.2f}, Overall Accuracy: {:.2f}'.format(
             epoch, optimizer.param_groups[0]['lr'], previous_best_iou, previous_best_acc))
@@ -192,7 +204,7 @@ def main():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
+            
             total_loss.update(loss.item())
 
             iters = epoch * len(trainloader) + i
@@ -203,7 +215,7 @@ def main():
             writer.add_scalar('train/loss_all', loss.item(), iters)
             writer.add_scalar('train/loss_x', loss.item(), iters)
             
-            if (i % (max(2, len(trainloader) // 8)) == 0) and (rank == 0):
+            if i % (max(2, len(trainloader) // 8)) == 0:
                 logger.info('Iters: {:}, Total loss: {:.3f}'.format(i, total_loss.avg))
 
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg)
@@ -235,7 +247,10 @@ def main():
         if is_best:
             torch.save(checkpoint, os.path.join(args.save_path, 'best.pth'))
 
-    test(args, cfg, model, logger, "supervised")
+    total_end_time = time.time()
+    total_training_seconds = total_end_time - total_start_time
+
+    test(args, cfg, model, logger, "supervised", calculate_speed=True, split=args.split, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
 
 if __name__ == '__main__':
     main()

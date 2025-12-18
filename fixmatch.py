@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import pprint
+import time
 
 import torch
 from torch import nn
@@ -14,8 +15,9 @@ import yaml
 from dataset.semi import SemiDataset
 from model.semseg.deeplabv3plus import DeepLabV3Plus
 from supervised import evaluate, test
-from util.utils import count_params, init_log, AverageMeter
+from util.utils import init_log, AverageMeter
 
+from thop import profile
 
 parser = argparse.ArgumentParser(description='Semi-Supervised Semantic Segmentation for Slum Detection')
 parser.add_argument('--config', type=str, required=True)
@@ -34,7 +36,6 @@ def main():
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
 
-    rank = 0
     world_size = 1
     local_rank = 0
 
@@ -49,13 +50,22 @@ def main():
     cudnn.benchmark = True
 
     model = DeepLabV3Plus(cfg)
-    logger.info('Total params: {:.1f}M\n'.format(count_params(model)))
+
+    C, H, W = 3, cfg['crop_size'], cfg['crop_size']
+    dummy_input = torch.randn(1, C, H, W).cuda(local_rank)
+    model.cuda(local_rank)
+    
+    flops, params = profile(model, inputs=(dummy_input,), verbose=False, custom_ops={})
+    
+    model_flops_g = flops / 1e9
+    model_params_m = params / 1e6
+    
+    logger.info('Total params (thop): {:.1f}M'.format(model_params_m))
+    logger.info('Inference FLOPs (thop): {:.2f}G on size {}x{}'.format(model_flops_g, H, W))
 
     optimizer = SGD([{'params': model.backbone.parameters(), 'lr': cfg['lr']},
                      {'params': [param for name, param in model.named_parameters() if 'backbone' not in name],
                       'lr': cfg['lr'] * cfg['lr_multi']}], lr=cfg['lr'], momentum=0.9, weight_decay=1e-4)
-
-    model.cuda(local_rank)
 
     criterion_l = nn.CrossEntropyLoss(ignore_index=255).cuda(local_rank)
 
@@ -77,16 +87,9 @@ def main():
     total_iters = len(trainloader_u) * cfg['epochs']
     previous_best_iou = 0.0
     epoch = -1
-
-    # if os.path.exists(os.path.join(args.save_path, 'latest.pth')):
-    #     checkpoint = torch.load(os.path.join(args.save_path, 'latest.pth'))
-    #     model.load_state_dict(checkpoint['model'])
-    #     optimizer.load_state_dict(checkpoint['optimizer'])
-    #     epoch = checkpoint['epoch']
-    #     previous_best_iou = checkpoint['previous_best_iou']
-        
-    #     logger.info('************ Load from checkpoint at epoch %i\n' % epoch)
     
+    total_start_time = time.time()
+
     for epoch in range(epoch + 1, cfg['epochs']):
         logger.info('===========> Epoch: {:}, LR: {:.5f}, Previous best Marco IoU: {:.2f}'.format(
             epoch, optimizer.param_groups[0]['lr'], previous_best_iou))
@@ -204,7 +207,10 @@ def main():
         if is_best:
             torch.save(checkpoint, os.path.join(args.save_path, 'best.pth'))
 
-    test(args, cfg, model, logger, "fixmatch", split=args.split)
+    total_end_time = time.time()
+    total_training_seconds = total_end_time - total_start_time
+
+    test(args, cfg, model, logger, "fixmatch", split=args.split, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
 
 if __name__ == '__main__':
     main()

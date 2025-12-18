@@ -3,6 +3,8 @@ from copy import deepcopy
 import logging
 import os
 import pprint
+import time
+import copy
 
 import torch
 from torch import nn
@@ -17,6 +19,7 @@ from model.semseg.dpt import DPT
 from supervised import evaluate, test
 from util.utils import count_params, init_log, AverageMeter
 
+from thop import profile
 
 parser = argparse.ArgumentParser(description='Semi-Supervised Semantic Segmentation for Slum Detection')
 parser.add_argument('--config', type=str, required=True)
@@ -34,7 +37,6 @@ def main():
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
 
-    rank = 0
     world_size = 1
     local_rank = 0
 
@@ -55,12 +57,13 @@ def main():
         'giant': {'encoder_size': 'giant', 'features': 384, 'out_channels': [1536, 1536, 1536, 1536]}
     }
     model = DPT(**{**model_configs[cfg['backbone'].split('_')[-1]], 'nclass': cfg['nclass']})
+    
     state_dict = torch.load(f'./pretrained/{cfg["backbone"]}.pth')
     model.backbone.load_state_dict(state_dict)
-        
+      
     if cfg['lock_backbone']:
         model.lock_backbone()
-    
+
     optimizer = AdamW(
         [
             {'params': [p for p in model.backbone.parameters() if p.requires_grad], 'lr': cfg['lr']},
@@ -69,11 +72,23 @@ def main():
         lr=cfg['lr'], betas=(0.9, 0.999), weight_decay=0.01
     )
     
-    logger.info('Total params: {:.1f}M'.format(count_params(model)))
-    logger.info('Encoder params: {:.1f}M'.format(count_params(model.backbone)))
-    logger.info('Decoder params: {:.1f}M\n'.format(count_params(model.head)))
-    
     model.cuda(local_rank)
+    
+    model.eval()
+    C, H, W = 3, cfg['crop_size'], cfg['crop_size']
+    dummy_input = torch.randn(1, C, H, W).cuda(local_rank)
+    
+    temp_model = copy.deepcopy(model)
+    flops, params = profile(temp_model, inputs=(dummy_input,), verbose=False)
+    model_flops_g = flops / 1e9
+    model_params_m = params / 1e6
+
+    del temp_model
+    torch.cuda.empty_cache()
+
+    logger.info('Total params (thop): {:.1f}M'.format(model_params_m))
+    logger.info('Inference FLOPs (thop): {:.2f}G on size {}x{}'.format(model_flops_g, H, W))
+    model.train()
     
     model_ema = deepcopy(model)
     model_ema.eval()
@@ -111,19 +126,8 @@ def main():
     best_epoch, best_epoch_ema = 0, 0
     epoch = -1
     
-    # if os.path.exists(os.path.join(args.save_path, 'latest.pth')):
-    #     checkpoint = torch.load(os.path.join(args.save_path, 'latest.pth'), map_location='cpu')
-    #     model.load_state_dict(checkpoint['model'])
-    #     model_ema.load_state_dict(checkpoint['model_ema'])
-    #     optimizer.load_state_dict(checkpoint['optimizer'])
-    #     epoch = checkpoint['epoch']
-    #     previous_best_iou = checkpoint['previous_best_iou']
-    #     previous_best_ema_iou = checkpoint['previous_best_ema_iou']
-    #     best_epoch = checkpoint['best_epoch']
-    #     best_epoch_ema = checkpoint['best_epoch_ema']
-        
-    #     logger.info('************ Load from checkpoint at epoch %i\n' % epoch)
-    
+    total_start_time = time.time()
+
     for epoch in range(epoch + 1, cfg['epochs']):
         logger.info('===========> Epoch: {:}, Previous best: {:.2f} @epoch-{:}, '
                     'EMA: {:.2f} @epoch-{:}'.format(epoch, previous_best_iou, best_epoch, previous_best_ema_iou, best_epoch_ema))
@@ -139,7 +143,7 @@ def main():
 
         for i, ((img_x, mask_x),
                 (img_u_w, img_u_s1, img_u_s2, ignore_mask, cutmix_box1, cutmix_box2)) in enumerate(loader):
-            
+
             img_x, mask_x = img_x.cuda(), mask_x.cuda()
             img_u_w, img_u_s1, img_u_s2 = img_u_w.cuda(), img_u_s1.cuda(), img_u_s2.cuda()
             ignore_mask, cutmix_box1, cutmix_box2 = ignore_mask.cuda(), cutmix_box1.cuda(), cutmix_box2.cuda()
@@ -214,8 +218,7 @@ def main():
             
             if i % log_frequency == 0:
                 logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Mask ratio: '
-                            '{:.3f}'.format(i, total_loss.avg, total_loss_x.avg, 
-                                            total_loss_s.avg, total_mask_ratio.avg))
+                            '{:.3f}'.format(i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_mask_ratio.avg))
         
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg, multiplier=14)
         ema_iou_class, ema_macro_iou, ema_overall_acc = evaluate(model_ema, valloader, cfg, multiplier=14)
@@ -263,8 +266,11 @@ def main():
         if is_best:
             torch.save(checkpoint, os.path.join(args.save_path, 'best.pth'))
 
-    test(args, cfg, model, logger, "unimatchv2", split=args.split, multiplier=14)
-    test(args, cfg, model_ema, logger, "unimatchv2", split=args.split, suffix='_ema', multiplier=14)
+    total_end_time = time.time()
+    total_training_seconds = total_end_time - total_start_time
+
+    test(args, cfg, model, logger, "unimatchv2", split=args.split, multiplier=14, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
+    test(args, cfg, model_ema, logger, "unimatchv2", split=args.split, suffix='_ema', multiplier=14, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
 
 if __name__ == '__main__':
     main()
