@@ -35,7 +35,7 @@ class DeepLabV3Plus(nn.Module):
 
         self.classifier = nn.Conv2d(256, cfg['nclass'], 1, bias=True)
 
-    def forward(self, x, need_fp=False):
+    def forward(self, x, need_fp=False, return_feature=False):
         h, w = x.shape[-2:]
 
         feats = self.backbone.base_forward(x)
@@ -51,6 +51,9 @@ class DeepLabV3Plus(nn.Module):
 
         out = self._decode(c1, c4)
         out = F.interpolate(out, size=(h, w), mode="bilinear", align_corners=True)
+
+        if return_feature:
+            return out, c4
 
         return out
 

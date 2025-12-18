@@ -4,8 +4,10 @@ method="$1"
 run_all_splits="$2"
 now=$(date +"%Y%m%d_%H%M%S")
 exp='r101'
-datasets=('lahore' 'karachi' 'mumbai' 'lower' 'medellin' 'makoko' 'eldaein' 'elgeneina')
-splits=(10 20 30)
+# datasets=('lahore' 'karachi' 'mumbai' 'lower' 'medellin' 'makoko' 'eldaein' 'elgeneina')
+# splits=(10 20 30)
+datasets=('lower')
+splits=(10)
 
 case "$method" in
     supervised|supervised-dino)
@@ -32,7 +34,8 @@ for dataset in "${datasets[@]}"; do
         for split in "${splits[@]}"; do
             labeled_id_path="splits/${dataset}/${split}/labeled.txt"
             unlabeled_id_path="splits/${dataset}/${split}/unlabeled.txt"
-            save_path="exp/${dataset}/${method}/${exp}/${split}"
+            # save_path="exp/${dataset}/${method}/${exp}/${split}"
+            save_path="tmp/exp/${dataset}/${method}/${exp}/${split}"
 
             [[ ! -f "$labeled_id_path" ]] && echo "Missing $labeled_id_path, skipping." && continue
 
