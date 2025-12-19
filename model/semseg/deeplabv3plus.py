@@ -42,22 +42,36 @@ class DeepLabV3Plus(nn.Module):
         c1, c4 = feats[0], feats[-1]
 
         if need_fp:
-            outs = self._decode(torch.cat((c1, nn.Dropout2d(0.5)(c1))),
-                                torch.cat((c4, nn.Dropout2d(0.5)(c4))))
+            outputs = self._decode(torch.cat((c1, nn.Dropout2d(0.5)(c1))),
+                                torch.cat((c4, nn.Dropout2d(0.5)(c4))),
+                                return_feature=return_feature)
+            if return_feature:
+                outs, features = outputs
+            else:
+                outs = outputs
+            
             outs = F.interpolate(outs, size=(h, w), mode="bilinear", align_corners=True)
             out, out_fp = outs.chunk(2)
 
+            if return_feature:
+                feat, _ = features.chunk(2)
+                return out, out_fp, feat
+                
             return out, out_fp
 
-        out = self._decode(c1, c4)
+        if return_feature:
+            out, feature = self._decode(c1, c4, return_feature=True)
+        else:
+            out = self._decode(c1, c4)
+        
         out = F.interpolate(out, size=(h, w), mode="bilinear", align_corners=True)
 
         if return_feature:
-            return out, c4
+            return out, feature
 
         return out
 
-    def _decode(self, c1, c4):
+    def _decode(self, c1, c4, return_feature=False):
         c4 = self.head(c4)
         c4 = F.interpolate(c4, size=c1.shape[-2:], mode="bilinear", align_corners=True)
 
@@ -68,6 +82,8 @@ class DeepLabV3Plus(nn.Module):
 
         out = self.classifier(feature)
 
+        if return_feature:
+            return out, feature
         return out
 
 

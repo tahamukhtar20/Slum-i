@@ -16,6 +16,7 @@ from dataset.semi import SemiDataset
 from model.semseg.deeplabv3plus import DeepLabV3Plus
 from supervised import evaluate, test
 from util.utils import init_log, AverageMeter
+from util.prototype import PrototypeBank
 
 from thop import profile
 
@@ -73,6 +74,8 @@ def main():
     logger.info('Total params (thop): {:.1f}M'.format(model_params_m))
     logger.info('Inference FLOPs (thop): {:.2f}G on size {}x{}'.format(model_flops_g, H, W))
     
+    proto_bank = PrototypeBank(num_classes=2, feat_dim=256, device='cuda')
+    
     optimizer = SGD([{'params': model.backbone.parameters(), 'lr': cfg['lr']},
                     {'params': [param for name, param in model.named_parameters() if 'backbone' not in name],
                     'lr': cfg['lr'] * cfg['lr_multi']}], lr=cfg['lr'], momentum=0.9, weight_decay=1e-4)
@@ -129,9 +132,14 @@ def main():
             with torch.no_grad():
                 model.eval()
 
-                pred_u_w_mix = model(img_u_w_mix).detach()
+                pred_u_w_mix, features_mix = model(img_u_w_mix, return_features=True)
+                pred_u_w_mix = pred_u_w_mix.detach()
+                features_mix = features_mix.detach()
+
                 conf_u_w_mix = pred_u_w_mix.softmax(dim=1).max(dim=1)[0]
                 mask_u_w_mix = pred_u_w_mix.argmax(dim=1)
+                
+                proto_weights_mix = proto_bank.get_consistency_weight(features_mix, mask_u_w_mix)
 
             img_u_s1[cutmix_box1.unsqueeze(1).expand(img_u_s1.shape) == 1] = \
                 img_u_s1_mix[cutmix_box1.unsqueeze(1).expand(img_u_s1.shape) == 1]
@@ -142,18 +150,35 @@ def main():
 
             num_lb, num_ulb = img_x.shape[0], img_u_w.shape[0]
 
-            preds, preds_fp = model(torch.cat((img_x, img_u_w)), True)
+            preds, preds_fp, features_all = model(torch.cat((img_x, img_u_w)), True, return_features=True)
+
             pred_x, pred_u_w = preds.split([num_lb, num_ulb])
             pred_u_w_fp = preds_fp[num_lb:]
+            _, features_u_w = features_all.split([num_lb, num_ulb])
 
             pred_u_s1, pred_u_s2 = model(torch.cat((img_u_s1, img_u_s2))).chunk(2)
 
             pred_u_w = pred_u_w.detach()
-            probs_u_w = pred_u_w.softmax(dim=1) # we get probabilities here
+            probs_u_w = pred_u_w.softmax(dim=1)
             conf_u_w = pred_u_w.softmax(dim=1).max(dim=1)[0]
-            # look for a better name below
+
             mask_uncertain = (conf_u_w < cfg['conf_thresh']) & (ignore_mask != 255)
             mask_u_w = pred_u_w.argmax(dim=1)
+            
+            with torch.no_grad():
+                mask_high_conf = (conf_u_w > 0.95)
+                update_mask = mask_u_w.clone()
+                update_mask[~mask_high_conf] = 255 
+                
+                proto_bank.update(features_u_w.detach(), update_mask)
+                
+                proto_weights = proto_bank.get_consistency_weight(features_u_w, mask_u_w)
+
+            proto_weights_cutmixed1 = proto_weights.clone()
+            proto_weights_cutmixed2 = proto_weights.clone()
+
+            proto_weights_cutmixed1[cutmix_box1 == 1] = proto_weights_mix[cutmix_box1 == 1]
+            proto_weights_cutmixed2[cutmix_box2 == 1] = proto_weights_mix[cutmix_box2 == 1]
 
             mask_u_w_cutmixed1, conf_u_w_cutmixed1, ignore_mask_cutmixed1 = \
                 mask_u_w.clone(), conf_u_w.clone(), ignore_mask.clone()
@@ -171,12 +196,14 @@ def main():
             loss_x = criterion_l(pred_x, mask_x)
 
             loss_u_s1 = criterion_u(pred_u_s1, mask_u_w_cutmixed1)
-            loss_u_s1 = loss_u_s1 * ((conf_u_w_cutmixed1 >= cfg['conf_thresh']) & (ignore_mask_cutmixed1 != 255))
-            loss_u_s1 = loss_u_s1.sum() / (ignore_mask_cutmixed1 != 255).sum().item()
+            consistency_weight1 = (conf_u_w_cutmixed1 >= cfg['conf_thresh']) * proto_weights_cutmixed1
+            loss_u_s1 = loss_u_s1 * (consistency_weight1 * (ignore_mask_cutmixed1 != 255))
+            loss_u_s1 = loss_u_s1.sum() / ((ignore_mask_cutmixed1 != 255).sum().item() + 1e-6)
 
             loss_u_s2 = criterion_u(pred_u_s2, mask_u_w_cutmixed2)
-            loss_u_s2 = loss_u_s2 * ((conf_u_w_cutmixed2 >= cfg['conf_thresh']) & (ignore_mask_cutmixed2 != 255))
-            loss_u_s2 = loss_u_s2.sum() / (ignore_mask_cutmixed2 != 255).sum().item()
+            consistency_weight2 = (conf_u_w_cutmixed2 >= cfg['conf_thresh']) * proto_weights_cutmixed2
+            loss_u_s2 = loss_u_s2 * (consistency_weight2 * (ignore_mask_cutmixed2 != 255))
+            loss_u_s2 = loss_u_s2.sum() / ((ignore_mask_cutmixed2 != 255).sum().item() + 1e-6)
 
             loss_u_w_fp = criterion_u(pred_u_w_fp, mask_u_w)
             loss_u_w_fp = loss_u_w_fp * ((conf_u_w >= cfg['conf_thresh']) & (ignore_mask != 255))
