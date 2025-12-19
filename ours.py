@@ -16,7 +16,6 @@ from dataset.semi import SemiDataset
 from model.semseg.deeplabv3plus import DeepLabV3Plus
 from supervised import evaluate, test
 from util.utils import init_log, AverageMeter
-from util.prototype_dist import PrototypeBank
 
 from thop import profile
 
@@ -28,11 +27,21 @@ parser.add_argument('--save-path', type=str, required=True)
 parser.add_argument('--results-dir', type=str, default='./results')
 parser.add_argument('--split', type=str, default='10')
 
+def init_seeds(seed=42):
+    import random
+    import numpy as np
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 def main():
     args = parser.parse_args()
 
     cfg = yaml.load(open(args.config, "r"), Loader=yaml.Loader)
+    
+    init_seeds(42)
 
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
@@ -92,9 +101,6 @@ def main():
     
     total_start_time = time.time()
     
-    proto_bank = PrototypeBank(num_classes=cfg['nclass'], feat_dim=2048) 
-    slum_ratio_ma = 0.0
-    
     for epoch in range(epoch + 1, cfg['epochs']):
         logger.info('===========> Epoch: {:}, LR: {:.5f}, Previous best IoU: {:.2f}'.format(
             epoch, optimizer.param_groups[0]['lr'], previous_best_iou))
@@ -102,6 +108,7 @@ def main():
         total_loss = AverageMeter()
         total_loss_x = AverageMeter()
         total_loss_s = AverageMeter()
+        total_loss_neg = AverageMeter()
         total_loss_w_fp = AverageMeter()
         total_mask_ratio = AverageMeter()
 
@@ -119,11 +126,6 @@ def main():
             img_u_s1_mix, img_u_s2_mix = img_u_s1_mix.cuda(), img_u_s2_mix.cuda()
             ignore_mask_mix = ignore_mask_mix.cuda()
 
-            with torch.no_grad():
-                feats_x_raw = model.backbone.base_forward(img_x)
-                feat_x = feats_x_raw[-1]
-                proto_bank.update(feat_x.detach(), mask_x)
-            
             with torch.no_grad():
                 model.eval()
 
@@ -144,68 +146,49 @@ def main():
             pred_x, pred_u_w = preds.split([num_lb, num_ulb])
             pred_u_w_fp = preds_fp[num_lb:]
 
-            out_s, feat_s = model(torch.cat((img_u_s1, img_u_s2)), return_feature=True)
-            pred_u_s1, pred_u_s2 = out_s.chunk(2)
-            feat_u_s1, feat_u_s2 = feat_s.chunk(2)
+            pred_u_s1, pred_u_s2 = model(torch.cat((img_u_s1, img_u_s2))).chunk(2)
 
             pred_u_w = pred_u_w.detach()
+            probs_u_w = pred_u_w.softmax(dim=1) # we get probabilities here
             conf_u_w = pred_u_w.softmax(dim=1).max(dim=1)[0]
+            # look for a better name below
+            mask_uncertain = (conf_u_w < cfg['conf_thresh']) & (ignore_mask != 255)
             mask_u_w = pred_u_w.argmax(dim=1)
-            
-            curr_slum_ratio = (mask_u_w == 1).float().mean().item()
-            slum_ratio_ma = 0.9 * slum_ratio_ma + 0.1 * curr_slum_ratio
-            
-            target_ratio = 0.05
-            slum_thresh = cfg['conf_thresh']
-            if slum_ratio_ma < target_ratio:
-                slum_thresh = max(0.7, cfg['conf_thresh'] * (slum_ratio_ma / (target_ratio + 1e-6)))
-
-            thresh_map = torch.ones_like(conf_u_w) * cfg['conf_thresh']
-            thresh_map[mask_u_w == 1] = slum_thresh
 
             mask_u_w_cutmixed1, conf_u_w_cutmixed1, ignore_mask_cutmixed1 = \
                 mask_u_w.clone(), conf_u_w.clone(), ignore_mask.clone()
             mask_u_w_cutmixed2, conf_u_w_cutmixed2, ignore_mask_cutmixed2 = \
                 mask_u_w.clone(), conf_u_w.clone(), ignore_mask.clone()
 
-            thresh_map_cutmixed1 = thresh_map.clone()
-            thresh_map_cutmixed2 = thresh_map.clone()
-
             mask_u_w_cutmixed1[cutmix_box1 == 1] = mask_u_w_mix[cutmix_box1 == 1]
             conf_u_w_cutmixed1[cutmix_box1 == 1] = conf_u_w_mix[cutmix_box1 == 1]
             ignore_mask_cutmixed1[cutmix_box1 == 1] = ignore_mask_mix[cutmix_box1 == 1]
 
-            thresh_map_cutmixed1[cutmix_box1 == 1] = cfg['conf_thresh']     
-
             mask_u_w_cutmixed2[cutmix_box2 == 1] = mask_u_w_mix[cutmix_box2 == 1]
             conf_u_w_cutmixed2[cutmix_box2 == 1] = conf_u_w_mix[cutmix_box2 == 1]
             ignore_mask_cutmixed2[cutmix_box2 == 1] = ignore_mask_mix[cutmix_box2 == 1]
-            thresh_map_cutmixed2[cutmix_box2 == 1] = cfg['conf_thresh']
 
-            weight_cons_s1 = proto_bank.get_consistency_weight(feat_u_s1, mask_u_w_cutmixed1)
-            weight_cons_s2 = proto_bank.get_consistency_weight(feat_u_s2, mask_u_w_cutmixed2)
-            
             loss_x = criterion_l(pred_x, mask_x)
 
             loss_u_s1 = criterion_u(pred_u_s1, mask_u_w_cutmixed1)
-            strong_mask_s1 = (conf_u_w_cutmixed1 >= thresh_map_cutmixed1) & (ignore_mask_cutmixed1 != 255)
-            
-            loss_u_s1 = loss_u_s1 * strong_mask_s1
-            loss_u_s1 = loss_u_s1 * weight_cons_s1
-            loss_u_s1 = loss_u_s1.sum() / (strong_mask_s1.sum().item() + 1e-6)
+            loss_u_s1 = loss_u_s1 * ((conf_u_w_cutmixed1 >= cfg['conf_thresh']) & (ignore_mask_cutmixed1 != 255))
+            loss_u_s1 = loss_u_s1.sum() / (ignore_mask_cutmixed1 != 255).sum().item()
 
             loss_u_s2 = criterion_u(pred_u_s2, mask_u_w_cutmixed2)
-            strong_mask_s2 = (conf_u_w_cutmixed2 >= thresh_map_cutmixed2) & (ignore_mask_cutmixed2 != 255)
-            
-            loss_u_s2 = loss_u_s2 * strong_mask_s2
-            loss_u_s2 = loss_u_s2 * weight_cons_s2
-            loss_u_s2 = loss_u_s2.sum() / (strong_mask_s2.sum().item() + 1e-6)
-            
+            loss_u_s2 = loss_u_s2 * ((conf_u_w_cutmixed2 >= cfg['conf_thresh']) & (ignore_mask_cutmixed2 != 255))
+            loss_u_s2 = loss_u_s2.sum() / (ignore_mask_cutmixed2 != 255).sum().item()
+
             loss_u_w_fp = criterion_u(pred_u_w_fp, mask_u_w)
             loss_u_w_fp = loss_u_w_fp * ((conf_u_w >= cfg['conf_thresh']) & (ignore_mask != 255))
             loss_u_w_fp = loss_u_w_fp.sum() / (ignore_mask != 255).sum().item()
 
-            loss = (loss_x + loss_u_s1 * 0.25 + loss_u_s2 * 0.25 + loss_u_w_fp * 0.5) / 2.0
+            mask_negative_classes = probs_u_w < cfg['neg_thresh']
+            probs_u_w_fp = pred_u_w_fp.softmax(dim=1)
+            loss_neg = -torch.log(1 - probs_u_w_fp + 1e-6)
+            loss_neg = loss_neg * mask_negative_classes * mask_uncertain.unsqueeze(1)
+            loss_neg = loss_neg.sum() / (mask_uncertain.sum().item() + 1e-6)
+
+            loss = (loss_x + loss_u_s1 * 0.25 + loss_u_s2 * 0.25 + loss_u_w_fp * 0.5 + loss_neg * 0.5) / 2.0
 
             optimizer.zero_grad()
             loss.backward()
@@ -214,10 +197,12 @@ def main():
             total_loss.update(loss.item())
             total_loss_x.update(loss_x.item())
             total_loss_s.update((loss_u_s1.item() + loss_u_s2.item()) / 2.0)
+            total_loss_neg.update(loss_neg.item())
             total_loss_w_fp.update(loss_u_w_fp.item())
             
-            mask_ratio = strong_mask_s1.sum().item() / (ignore_mask != 255).sum()
-            total_mask_ratio.update(mask_ratio)
+            mask_ratio = ((conf_u_w >= cfg['conf_thresh']) & (ignore_mask != 255)).sum().item() / \
+                (ignore_mask != 255).sum()
+            total_mask_ratio.update(mask_ratio.item())
 
             iters = epoch * len(trainloader_u) + i
             lr = cfg['lr'] * (1 - iters / total_iters) ** 0.9
@@ -227,6 +212,7 @@ def main():
             writer.add_scalar('train/loss_all', loss.item(), iters)
             writer.add_scalar('train/loss_x', loss_x.item(), iters)
             writer.add_scalar('train/loss_s', (loss_u_s1.item() + loss_u_s2.item()) / 2.0, iters)
+            writer.add_scalar('train/loss_neg', loss_neg.item(), iters)
             writer.add_scalar('train/loss_w_fp', loss_u_w_fp.item(), iters)
             writer.add_scalar('train/mask_ratio', mask_ratio, iters)
     
@@ -236,9 +222,9 @@ def main():
                 log_frequency = max(1, len(trainloader_u) // 8) 
                         
             if i % log_frequency == 0:
-                logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Mask ratio: '
-                            '{:.3f}'.format(i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_mask_ratio.avg))
-        
+                logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Loss fp: {:.3f}, Loss neg: {:.3f}, Mask ratio: {:.3f}'.format(
+                        i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_loss_w_fp.avg, total_loss_neg.avg, total_mask_ratio.avg))
+
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg)
 
         logger.info('***** Evaluation ***** >>>> Background IoU: {:.2f}'.format(iou_class[0]))
