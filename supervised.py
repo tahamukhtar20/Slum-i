@@ -8,7 +8,6 @@ import math
 import torch
 from torch import nn
 import torch.nn.functional as F
-import torch.backends.cudnn as cudnn
 from torch.optim import SGD
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -27,6 +26,26 @@ parser.add_argument('--unlabeled-id-path', type=str, default=None)
 parser.add_argument('--save-path', type=str, required=True)
 parser.add_argument('--results-dir', type=str, default='./results')
 parser.add_argument('--split', type=str, default='full')
+
+def init_seeds(seed=42):
+    import random
+    import numpy as np
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.enabled = True
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
+
+def seed_worker(worker_id):
+    import numpy as np
+    import random
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 
 def evaluate(model, loader, cfg, calculate_speed=False, multiplier=None):
@@ -131,6 +150,8 @@ def test(args, cfg, model, logger, method, split=None, suffix='', multiplier=Non
 
 
 def main():
+    init_seeds(42)
+    
     args = parser.parse_args()
 
     cfg = yaml.load(open(args.config, "r"), Loader=yaml.Loader)
@@ -147,9 +168,6 @@ def main():
     writer = SummaryWriter(args.save_path)
     
     os.makedirs(args.save_path, exist_ok=True)
-
-    cudnn.enabled = True
-    cudnn.benchmark = True
 
     model = DeepLabV3Plus(cfg)
     
@@ -174,8 +192,11 @@ def main():
     trainset = SemiDataset(cfg['dataset'], cfg['data_root'], 'train_l', cfg['crop_size'], args.labeled_id_path)
     valset = SemiDataset(cfg['dataset'], cfg['data_root'], 'val')
 
+    g = torch.Generator()
+    g.manual_seed(42)
+    
     trainloader = DataLoader(trainset, batch_size=cfg['batch_size'],
-                             pin_memory=True, num_workers=1, drop_last=True, shuffle=True)
+                             pin_memory=True, num_workers=1, drop_last=True, shuffle=True, worker_init_fn=seed_worker, generator=g)
     valloader = DataLoader(valset, batch_size=1, pin_memory=True, num_workers=1,
                            drop_last=False)
 

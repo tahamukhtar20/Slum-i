@@ -6,7 +6,6 @@ import time
 
 import torch
 from torch import nn
-import torch.backends.cudnn as cudnn
 from torch.optim import SGD
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -14,7 +13,7 @@ import yaml
 
 from dataset.semi import SemiDataset
 from model.semseg.deeplabv3plus import DeepLabV3Plus
-from supervised import evaluate, test
+from supervised import evaluate, init_seeds, seed_worker, test
 from util.utils import init_log, AverageMeter
 from util.prototype import PrototypeBank
 
@@ -28,21 +27,12 @@ parser.add_argument('--save-path', type=str, required=True)
 parser.add_argument('--results-dir', type=str, default='./results')
 parser.add_argument('--split', type=str, default='10')
 
-def init_seeds(seed=42):
-    import random
-    import numpy as np
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
 def main():
+    init_seeds(42)
+    
     args = parser.parse_args()
 
     cfg = yaml.load(open(args.config, "r"), Loader=yaml.Loader)
-    
-    init_seeds(42)
 
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
@@ -56,9 +46,6 @@ def main():
     writer = SummaryWriter(args.save_path)
     
     os.makedirs(args.save_path, exist_ok=True)
-    
-    cudnn.enabled = True
-    cudnn.benchmark = True
 
     model = DeepLabV3Plus(cfg)
     
@@ -74,7 +61,7 @@ def main():
     logger.info('Total params (thop): {:.1f}M'.format(model_params_m))
     logger.info('Inference FLOPs (thop): {:.2f}G on size {}x{}'.format(model_flops_g, H, W))
     
-    proto_bank = PrototypeBank(num_classes=2, feat_dim=256, device='cuda')
+    proto_bank = PrototypeBank(num_classes=2, feat_dim=256, queue_size=2000, device='cuda')
     
     optimizer = SGD([{'params': model.backbone.parameters(), 'lr': cfg['lr']},
                     {'params': [param for name, param in model.named_parameters() if 'backbone' not in name],
@@ -90,10 +77,13 @@ def main():
                              cfg['crop_size'], args.labeled_id_path, nsample=len(trainset_u.ids))
     valset = SemiDataset(cfg['dataset'], cfg['data_root'], 'val')
 
+    g = torch.Generator()
+    g.manual_seed(42)
+
     trainloader_l = DataLoader(trainset_l, batch_size=cfg['batch_size'],
-                               pin_memory=True, num_workers=1, drop_last=True)
+                               pin_memory=True, num_workers=1, drop_last=True, shuffle=True, worker_init_fn=seed_worker, generator=g)
     trainloader_u = DataLoader(trainset_u, batch_size=cfg['batch_size'],
-                               pin_memory=True, num_workers=1, drop_last=True)
+                               pin_memory=True, num_workers=1, drop_last=True, shuffle=True, worker_init_fn=seed_worker, generator=g)
     valloader = DataLoader(valset, batch_size=1, pin_memory=True, num_workers=1,
                            drop_last=False)
 
@@ -114,6 +104,7 @@ def main():
         total_loss_neg = AverageMeter()
         total_loss_w_fp = AverageMeter()
         total_mask_ratio = AverageMeter()
+        total_proto_weight = AverageMeter()
 
         loader = zip(trainloader_l, trainloader_u, trainloader_u)
 
@@ -132,7 +123,7 @@ def main():
             with torch.no_grad():
                 model.eval()
 
-                pred_u_w_mix, features_mix = model(img_u_w_mix, return_features=True)
+                pred_u_w_mix, features_mix = model(img_u_w_mix, return_feature=True)
                 pred_u_w_mix = pred_u_w_mix.detach()
                 features_mix = features_mix.detach()
 
@@ -150,7 +141,7 @@ def main():
 
             num_lb, num_ulb = img_x.shape[0], img_u_w.shape[0]
 
-            preds, preds_fp, features_all = model(torch.cat((img_x, img_u_w)), True, return_features=True)
+            preds, preds_fp, features_all = model(torch.cat((img_x, img_u_w)), True, return_feature=True)
 
             pred_x, pred_u_w = preds.split([num_lb, num_ulb])
             pred_u_w_fp = preds_fp[num_lb:]
@@ -174,6 +165,8 @@ def main():
                 
                 proto_weights = proto_bank.get_consistency_weight(features_u_w, mask_u_w)
 
+            total_proto_weight.update(proto_weights.mean().item())
+            
             proto_weights_cutmixed1 = proto_weights.clone()
             proto_weights_cutmixed2 = proto_weights.clone()
 
@@ -207,7 +200,7 @@ def main():
 
             loss_u_w_fp = criterion_u(pred_u_w_fp, mask_u_w)
             loss_u_w_fp = loss_u_w_fp * ((conf_u_w >= cfg['conf_thresh']) & (ignore_mask != 255))
-            loss_u_w_fp = loss_u_w_fp.sum() / (ignore_mask != 255).sum().item()
+            loss_u_w_fp = loss_u_w_fp.sum() / ((ignore_mask != 255).sum().item() + 1e-6)
 
             mask_negative_classes = probs_u_w < cfg['neg_thresh']
             probs_u_w_fp = pred_u_w_fp.softmax(dim=1)
@@ -249,8 +242,8 @@ def main():
                 log_frequency = max(1, len(trainloader_u) // 8) 
                         
             if i % log_frequency == 0:
-                logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Loss fp: {:.3f}, Loss neg: {:.3f}, Mask ratio: {:.3f}'.format(
-                        i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_loss_w_fp.avg, total_loss_neg.avg, total_mask_ratio.avg))
+                logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Loss fp: {:.3f}, Loss neg: {:.3f}, Mask ratio: {:.3f}, Proto W: {:.3f}'.format(
+                        i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_loss_w_fp.avg, total_loss_neg.avg, total_mask_ratio.avg, total_proto_weight.avg))
 
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg)
 
@@ -284,7 +277,7 @@ def main():
     total_end_time = time.time()
     total_training_seconds = total_end_time - total_start_time
 
-    test(args, cfg, model, logger, "ours", split=args.split, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
+    test(args, cfg, model, logger, f"ours", split=args.split, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
 
 if __name__ == '__main__':
     main()

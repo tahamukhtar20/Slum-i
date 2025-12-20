@@ -8,7 +8,6 @@ import copy
 
 import torch
 from torch import nn
-import torch.backends.cudnn as cudnn
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -16,8 +15,8 @@ import yaml
 
 from dataset.semi import SemiDataset
 from model.semseg.dpt import DPT
-from supervised import evaluate, test
-from util.utils import count_params, init_log, AverageMeter
+from supervised import evaluate, init_seeds, seed_worker, test
+from util.utils import init_log, AverageMeter
 
 from thop import profile
 
@@ -30,6 +29,8 @@ parser.add_argument('--results-dir', type=str, default='./results')
 parser.add_argument('--split', type=str, default='10')
 
 def main():
+    init_seeds(42)
+    
     args = parser.parse_args()
 
     cfg = yaml.load(open(args.config, "r"), Loader=yaml.Loader)
@@ -46,9 +47,6 @@ def main():
     writer = SummaryWriter(args.save_path)
     
     os.makedirs(args.save_path, exist_ok=True)
-
-    cudnn.enabled = True
-    cudnn.benchmark = True
 
     model_configs = {
         'small': {'encoder_size': 'small', 'features': 64, 'out_channels': [48, 96, 192, 384]},
@@ -109,12 +107,15 @@ def main():
         cfg['dataset'], cfg['data_root'], 'val'
     )
     
+    g = torch.Generator()
+    g.manual_seed(42)
+    
     trainloader_l = DataLoader(
-        trainset_l, batch_size=cfg['batch_size'], pin_memory=True, num_workers=4, drop_last=True
+        trainset_l, batch_size=cfg['batch_size'], pin_memory=True, num_workers=4, drop_last=True, shuffle=True, worker_init_fn=seed_worker, generator=g
     )
     
     trainloader_u = DataLoader(
-        trainset_u, batch_size=cfg['batch_size'], pin_memory=True, num_workers=4, drop_last=True
+        trainset_u, batch_size=cfg['batch_size'], pin_memory=True, num_workers=4, drop_last=True, shuffle=True, worker_init_fn=seed_worker, generator=g
     )
     
     valloader = DataLoader(
