@@ -1,0 +1,671 @@
+[2025-12-20 19:43:43,893][    INFO] {'backbone': 'resnet101',
+ 'batch_size': 8,
+ 'conf_thresh': 0.95,
+ 'config': 'configs/deeplab/ours/medellin.yaml',
+ 'crop_size': 512,
+ 'data_root': '/netscratch/mukhtar/DataExtraction/Medellin',
+ 'dataset': 'medellin',
+ 'dilations': [6, 12, 18],
+ 'epochs': 80,
+ 'labeled_id_path': 'splits/medellin/30/labeled.txt',
+ 'lr': 0.02,
+ 'lr_multi': 1.0,
+ 'model': 'deeplabv3plus',
+ 'nclass': 2,
+ 'neg_thresh': 0.1,
+ 'ngpus': 1,
+ 'replace_stride_with_dilation': [False, False, True],
+ 'results_dir': './results',
+ 'save_path': 'exp/medellin/ours_sat_only/r101/30',
+ 'split': '30',
+ 'unlabeled_id_path': 'splits/medellin/30/unlabeled.txt'}
+
+[2025-12-20 19:43:45,814][    INFO] Total params (thop): 59.5M
+[2025-12-20 19:43:45,814][    INFO] Inference FLOPs (thop): 96.08G on size 512x512
+[2025-12-20 19:43:45,884][    INFO] ===========> Epoch: 0, LR: 0.02000, Previous best IoU: 0.00
+[2025-12-20 19:43:48,969][    INFO] Iters: 0, Total loss: 0.366, Loss x: 0.733, Loss s: 0.000, Loss fp: 0.000, Loss neg: 0.000, Mask ratio: 0.000, Proto W: 1.000
+[2025-12-20 19:43:50,450][    INFO] Iters: 1, Total loss: 0.344, Loss x: 0.689, Loss s: 0.000, Loss fp: 0.000, Loss neg: 0.000, Mask ratio: 0.000, Proto W: 1.000
+[2025-12-20 19:43:50,767][    INFO] ***** Evaluation ***** >>>> Background IoU: 62.82
+[2025-12-20 19:43:50,767][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 6.42
+[2025-12-20 19:43:50,767][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 34.62
+[2025-12-20 19:43:50,767][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 63.74
+
+[2025-12-20 19:43:52,271][    INFO] ===========> Epoch: 1, LR: 0.01989, Previous best IoU: 34.62
+[2025-12-20 19:43:54,697][    INFO] Iters: 0, Total loss: 0.273, Loss x: 0.547, Loss s: 0.000, Loss fp: 0.000, Loss neg: 0.000, Mask ratio: 0.000, Proto W: 1.000
+[2025-12-20 19:43:56,179][    INFO] Iters: 1, Total loss: 0.286, Loss x: 0.571, Loss s: 0.000, Loss fp: 0.000, Loss neg: 0.000, Mask ratio: 0.000, Proto W: 1.000
+[2025-12-20 19:43:56,465][    INFO] ***** Evaluation ***** >>>> Background IoU: 62.58
+[2025-12-20 19:43:56,465][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 0.00
+[2025-12-20 19:43:56,465][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 31.29
+[2025-12-20 19:43:56,465][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 62.58
+
+[2025-12-20 19:43:57,177][    INFO] ===========> Epoch: 2, LR: 0.01966, Previous best IoU: 34.62
+[2025-12-20 19:43:59,650][    INFO] Iters: 0, Total loss: 0.262, Loss x: 0.524, Loss s: 0.000, Loss fp: 0.000, Loss neg: 0.011, Mask ratio: 0.000, Proto W: 1.000
+[2025-12-20 19:44:01,141][    INFO] Iters: 1, Total loss: 0.188, Loss x: 0.375, Loss s: 0.001, Loss fp: 0.001, Loss neg: 0.010, Mask ratio: 0.008, Proto W: 1.000
+[2025-12-20 19:44:01,428][    INFO] ***** Evaluation ***** >>>> Background IoU: 70.59
+[2025-12-20 19:44:01,428][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 38.00
+[2025-12-20 19:44:01,428][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 54.29
+[2025-12-20 19:44:01,428][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 75.08
+
+[2025-12-20 19:44:03,105][    INFO] ===========> Epoch: 3, LR: 0.01944, Previous best IoU: 54.29
+[2025-12-20 19:44:05,605][    INFO] Iters: 0, Total loss: 0.107, Loss x: 0.207, Loss s: 0.005, Loss fp: 0.008, Loss neg: 0.040, Mask ratio: 0.087, Proto W: 1.000
+[2025-12-20 19:44:07,091][    INFO] Iters: 1, Total loss: 0.103, Loss x: 0.190, Loss s: 0.017, Loss fp: 0.014, Loss neg: 0.039, Mask ratio: 0.114, Proto W: 1.000
+[2025-12-20 19:44:07,401][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.95
+[2025-12-20 19:44:07,401][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 70.18
+[2025-12-20 19:44:07,401][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.06
+[2025-12-20 19:44:07,401][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.48
+
+[2025-12-20 19:44:09,217][    INFO] ===========> Epoch: 4, LR: 0.01921, Previous best IoU: 74.06
+[2025-12-20 19:44:11,706][    INFO] Iters: 0, Total loss: 0.074, Loss x: 0.104, Loss s: 0.046, Loss fp: 0.042, Loss neg: 0.051, Mask ratio: 0.309, Proto W: 1.000
+[2025-12-20 19:44:13,191][    INFO] Iters: 1, Total loss: 0.099, Loss x: 0.153, Loss s: 0.053, Loss fp: 0.040, Loss neg: 0.054, Mask ratio: 0.345, Proto W: 1.000
+[2025-12-20 19:44:13,477][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.81
+[2025-12-20 19:44:13,477][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 69.96
+[2025-12-20 19:44:13,477][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 73.39
+[2025-12-20 19:44:13,477][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 84.94
+
+[2025-12-20 19:44:14,242][    INFO] ===========> Epoch: 5, LR: 0.01898, Previous best IoU: 74.06
+[2025-12-20 19:44:16,744][    INFO] Iters: 0, Total loss: 0.066, Loss x: 0.071, Loss s: 0.087, Loss fp: 0.035, Loss neg: 0.046, Mask ratio: 0.445, Proto W: 1.000
+[2025-12-20 19:44:18,239][    INFO] Iters: 1, Total loss: 0.068, Loss x: 0.072, Loss s: 0.079, Loss fp: 0.048, Loss neg: 0.062, Mask ratio: 0.515, Proto W: 1.000
+[2025-12-20 19:44:18,527][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.78
+[2025-12-20 19:44:18,528][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 75.58
+[2025-12-20 19:44:18,528][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 79.68
+[2025-12-20 19:44:18,528][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 89.20
+
+[2025-12-20 19:44:20,070][    INFO] ===========> Epoch: 6, LR: 0.01876, Previous best IoU: 79.68
+[2025-12-20 19:44:22,548][    INFO] Iters: 0, Total loss: 0.086, Loss x: 0.080, Loss s: 0.128, Loss fp: 0.057, Loss neg: 0.087, Mask ratio: 0.555, Proto W: 1.000
+[2025-12-20 19:44:24,034][    INFO] Iters: 1, Total loss: 0.085, Loss x: 0.073, Loss s: 0.140, Loss fp: 0.052, Loss neg: 0.080, Mask ratio: 0.576, Proto W: 1.000
+[2025-12-20 19:44:24,322][    INFO] ***** Evaluation ***** >>>> Background IoU: 84.38
+[2025-12-20 19:44:24,322][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 70.80
+[2025-12-20 19:44:24,322][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 77.59
+[2025-12-20 19:44:24,322][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 88.67
+
+[2025-12-20 19:44:25,070][    INFO] ===========> Epoch: 7, LR: 0.01853, Previous best IoU: 79.68
+[2025-12-20 19:44:27,515][    INFO] Iters: 0, Total loss: 0.078, Loss x: 0.049, Loss s: 0.168, Loss fp: 0.049, Loss neg: 0.074, Mask ratio: 0.692, Proto W: 1.000
+[2025-12-20 19:44:29,000][    INFO] Iters: 1, Total loss: 0.078, Loss x: 0.058, Loss s: 0.140, Loss fp: 0.056, Loss neg: 0.078, Mask ratio: 0.627, Proto W: 1.000
+[2025-12-20 19:44:29,284][    INFO] ***** Evaluation ***** >>>> Background IoU: 78.09
+[2025-12-20 19:44:29,284][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 53.09
+[2025-12-20 19:44:29,284][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 65.59
+[2025-12-20 19:44:29,284][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 82.45
+
+[2025-12-20 19:44:30,095][    INFO] ===========> Epoch: 8, LR: 0.01830, Previous best IoU: 79.68
+[2025-12-20 19:44:32,503][    INFO] Iters: 0, Total loss: 0.061, Loss x: 0.058, Loss s: 0.095, Loss fp: 0.034, Loss neg: 0.066, Mask ratio: 0.604, Proto W: 1.000
+[2025-12-20 19:44:33,990][    INFO] Iters: 1, Total loss: 0.059, Loss x: 0.049, Loss s: 0.100, Loss fp: 0.037, Loss neg: 0.065, Mask ratio: 0.633, Proto W: 1.000
+[2025-12-20 19:44:34,282][    INFO] ***** Evaluation ***** >>>> Background IoU: 72.94
+[2025-12-20 19:44:34,282][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 37.95
+[2025-12-20 19:44:34,282][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 55.45
+[2025-12-20 19:44:34,282][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 76.78
+
+[2025-12-20 19:44:34,982][    INFO] ===========> Epoch: 9, LR: 0.01808, Previous best IoU: 79.68
+[2025-12-20 19:44:37,499][    INFO] Iters: 0, Total loss: 0.062, Loss x: 0.045, Loss s: 0.122, Loss fp: 0.034, Loss neg: 0.066, Mask ratio: 0.765, Proto W: 1.000
+[2025-12-20 19:44:38,989][    INFO] Iters: 1, Total loss: 0.095, Loss x: 0.091, Loss s: 0.163, Loss fp: 0.035, Loss neg: 0.066, Mask ratio: 0.731, Proto W: 1.000
+[2025-12-20 19:44:39,262][    INFO] ***** Evaluation ***** >>>> Background IoU: 73.81
+[2025-12-20 19:44:39,262][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 40.66
+[2025-12-20 19:44:39,262][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 57.24
+[2025-12-20 19:44:39,262][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 77.80
+
+[2025-12-20 19:44:39,946][    INFO] ===========> Epoch: 10, LR: 0.01785, Previous best IoU: 79.68
+[2025-12-20 19:44:42,430][    INFO] Iters: 0, Total loss: 0.084, Loss x: 0.058, Loss s: 0.188, Loss fp: 0.034, Loss neg: 0.062, Mask ratio: 0.619, Proto W: 1.000
+[2025-12-20 19:44:43,929][    INFO] Iters: 1, Total loss: 0.071, Loss x: 0.047, Loss s: 0.154, Loss fp: 0.034, Loss neg: 0.063, Mask ratio: 0.728, Proto W: 1.000
+[2025-12-20 19:44:44,216][    INFO] ***** Evaluation ***** >>>> Background IoU: 71.05
+[2025-12-20 19:44:44,217][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 31.85
+[2025-12-20 19:44:44,217][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 51.45
+[2025-12-20 19:44:44,217][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 74.50
+
+[2025-12-20 19:44:44,984][    INFO] ===========> Epoch: 11, LR: 0.01762, Previous best IoU: 79.68
+[2025-12-20 19:44:47,429][    INFO] Iters: 0, Total loss: 0.095, Loss x: 0.121, Loss s: 0.111, Loss fp: 0.025, Loss neg: 0.058, Mask ratio: 0.712, Proto W: 1.000
+[2025-12-20 19:44:48,929][    INFO] Iters: 1, Total loss: 0.090, Loss x: 0.093, Loss s: 0.148, Loss fp: 0.026, Loss neg: 0.060, Mask ratio: 0.746, Proto W: 1.000
+[2025-12-20 19:44:49,217][    INFO] ***** Evaluation ***** >>>> Background IoU: 72.93
+[2025-12-20 19:44:49,217][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 37.92
+[2025-12-20 19:44:49,217][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 55.42
+[2025-12-20 19:44:49,217][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 76.77
+
+[2025-12-20 19:44:49,912][    INFO] ===========> Epoch: 12, LR: 0.01739, Previous best IoU: 79.68
+[2025-12-20 19:44:52,426][    INFO] Iters: 0, Total loss: 0.062, Loss x: 0.059, Loss s: 0.105, Loss fp: 0.027, Loss neg: 0.065, Mask ratio: 0.760, Proto W: 1.000
+[2025-12-20 19:44:53,917][    INFO] Iters: 1, Total loss: 0.072, Loss x: 0.057, Loss s: 0.146, Loss fp: 0.027, Loss neg: 0.065, Mask ratio: 0.743, Proto W: 1.000
+[2025-12-20 19:44:54,211][    INFO] ***** Evaluation ***** >>>> Background IoU: 79.63
+[2025-12-20 19:44:54,211][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 57.24
+[2025-12-20 19:44:54,211][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 68.44
+[2025-12-20 19:44:54,211][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 83.99
+
+[2025-12-20 19:44:54,876][    INFO] ===========> Epoch: 13, LR: 0.01716, Previous best IoU: 79.68
+[2025-12-20 19:44:57,345][    INFO] Iters: 0, Total loss: 0.049, Loss x: 0.052, Loss s: 0.071, Loss fp: 0.020, Loss neg: 0.046, Mask ratio: 0.656, Proto W: 1.000
+[2025-12-20 19:44:58,836][    INFO] Iters: 1, Total loss: 0.046, Loss x: 0.047, Loss s: 0.069, Loss fp: 0.021, Loss neg: 0.054, Mask ratio: 0.730, Proto W: 1.000
+[2025-12-20 19:44:59,141][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.33
+[2025-12-20 19:44:59,141][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 64.33
+[2025-12-20 19:44:59,141][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 73.33
+[2025-12-20 19:44:59,141][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.60
+
+[2025-12-20 19:44:59,885][    INFO] ===========> Epoch: 14, LR: 0.01694, Previous best IoU: 79.68
+[2025-12-20 19:45:02,408][    INFO] Iters: 0, Total loss: 0.049, Loss x: 0.037, Loss s: 0.098, Loss fp: 0.023, Loss neg: 0.062, Mask ratio: 0.681, Proto W: 1.000
+[2025-12-20 19:45:03,904][    INFO] Iters: 1, Total loss: 0.043, Loss x: 0.037, Loss s: 0.080, Loss fp: 0.019, Loss neg: 0.061, Mask ratio: 0.758, Proto W: 1.000
+[2025-12-20 19:45:04,193][    INFO] ***** Evaluation ***** >>>> Background IoU: 85.83
+[2025-12-20 19:45:04,193][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 73.04
+[2025-12-20 19:45:04,193][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 79.44
+[2025-12-20 19:45:04,193][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 89.76
+
+[2025-12-20 19:45:04,942][    INFO] ===========> Epoch: 15, LR: 0.01671, Previous best IoU: 79.68
+[2025-12-20 19:45:07,422][    INFO] Iters: 0, Total loss: 0.061, Loss x: 0.045, Loss s: 0.132, Loss fp: 0.020, Loss neg: 0.052, Mask ratio: 0.759, Proto W: 1.000
+[2025-12-20 19:45:08,915][    INFO] Iters: 1, Total loss: 0.080, Loss x: 0.045, Loss s: 0.209, Loss fp: 0.020, Loss neg: 0.051, Mask ratio: 0.747, Proto W: 1.000
+[2025-12-20 19:45:09,207][    INFO] ***** Evaluation ***** >>>> Background IoU: 85.83
+[2025-12-20 19:45:09,207][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 72.52
+[2025-12-20 19:45:09,207][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 79.17
+[2025-12-20 19:45:09,207][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 89.69
+
+[2025-12-20 19:45:09,896][    INFO] ===========> Epoch: 16, LR: 0.01648, Previous best IoU: 79.68
+[2025-12-20 19:45:12,373][    INFO] Iters: 0, Total loss: 0.066, Loss x: 0.048, Loss s: 0.148, Loss fp: 0.018, Loss neg: 0.073, Mask ratio: 0.830, Proto W: 1.000
+[2025-12-20 19:45:13,865][    INFO] Iters: 1, Total loss: 0.064, Loss x: 0.042, Loss s: 0.156, Loss fp: 0.018, Loss neg: 0.065, Mask ratio: 0.841, Proto W: 1.000
+[2025-12-20 19:45:14,170][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.92
+[2025-12-20 19:45:14,170][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 60.58
+[2025-12-20 19:45:14,170][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 70.75
+[2025-12-20 19:45:14,170][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.25
+
+[2025-12-20 19:45:14,916][    INFO] ===========> Epoch: 17, LR: 0.01625, Previous best IoU: 79.68
+[2025-12-20 19:45:17,382][    INFO] Iters: 0, Total loss: 0.058, Loss x: 0.039, Loss s: 0.137, Loss fp: 0.017, Loss neg: 0.061, Mask ratio: 0.873, Proto W: 1.000
+[2025-12-20 19:45:18,877][    INFO] Iters: 1, Total loss: 0.078, Loss x: 0.038, Loss s: 0.215, Loss fp: 0.021, Loss neg: 0.068, Mask ratio: 0.863, Proto W: 1.000
+[2025-12-20 19:45:19,162][    INFO] ***** Evaluation ***** >>>> Background IoU: 74.64
+[2025-12-20 19:45:19,162][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 43.18
+[2025-12-20 19:45:19,162][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 58.91
+[2025-12-20 19:45:19,162][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 78.74
+
+[2025-12-20 19:45:19,887][    INFO] ===========> Epoch: 18, LR: 0.01602, Previous best IoU: 79.68
+[2025-12-20 19:45:22,435][    INFO] Iters: 0, Total loss: 0.059, Loss x: 0.017, Loss s: 0.180, Loss fp: 0.023, Loss neg: 0.062, Mask ratio: 0.741, Proto W: 1.000
+[2025-12-20 19:45:23,927][    INFO] Iters: 1, Total loss: 0.062, Loss x: 0.057, Loss s: 0.118, Loss fp: 0.018, Loss neg: 0.060, Mask ratio: 0.802, Proto W: 1.000
+[2025-12-20 19:45:24,211][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.78
+[2025-12-20 19:45:24,211][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 49.43
+[2025-12-20 19:45:24,211][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.11
+[2025-12-20 19:45:24,211][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.08
+
+[2025-12-20 19:45:24,924][    INFO] ===========> Epoch: 19, LR: 0.01578, Previous best IoU: 79.68
+[2025-12-20 19:45:27,508][    INFO] Iters: 0, Total loss: 0.058, Loss x: 0.058, Loss s: 0.097, Loss fp: 0.017, Loss neg: 0.046, Mask ratio: 0.715, Proto W: 1.000
+[2025-12-20 19:45:29,002][    INFO] Iters: 1, Total loss: 0.054, Loss x: 0.040, Loss s: 0.120, Loss fp: 0.016, Loss neg: 0.049, Mask ratio: 0.775, Proto W: 1.000
+[2025-12-20 19:45:29,290][    INFO] ***** Evaluation ***** >>>> Background IoU: 74.52
+[2025-12-20 19:45:29,290][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 42.82
+[2025-12-20 19:45:29,290][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 58.67
+[2025-12-20 19:45:29,290][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 78.61
+
+[2025-12-20 19:45:30,039][    INFO] ===========> Epoch: 20, LR: 0.01555, Previous best IoU: 79.68
+[2025-12-20 19:45:32,553][    INFO] Iters: 0, Total loss: 0.048, Loss x: 0.043, Loss s: 0.086, Loss fp: 0.022, Loss neg: 0.061, Mask ratio: 0.779, Proto W: 1.000
+[2025-12-20 19:45:34,055][    INFO] Iters: 1, Total loss: 0.050, Loss x: 0.049, Loss s: 0.083, Loss fp: 0.019, Loss neg: 0.064, Mask ratio: 0.777, Proto W: 1.000
+[2025-12-20 19:45:34,350][    INFO] ***** Evaluation ***** >>>> Background IoU: 75.07
+[2025-12-20 19:45:34,350][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 44.46
+[2025-12-20 19:45:34,350][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 59.77
+[2025-12-20 19:45:34,350][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 79.22
+
+[2025-12-20 19:45:35,069][    INFO] ===========> Epoch: 21, LR: 0.01532, Previous best IoU: 79.68
+[2025-12-20 19:45:37,607][    INFO] Iters: 0, Total loss: 0.118, Loss x: 0.159, Loss s: 0.140, Loss fp: 0.014, Loss neg: 0.050, Mask ratio: 0.854, Proto W: 1.000
+[2025-12-20 19:45:39,101][    INFO] Iters: 1, Total loss: 0.083, Loss x: 0.092, Loss s: 0.134, Loss fp: 0.015, Loss neg: 0.050, Mask ratio: 0.782, Proto W: 1.000
+[2025-12-20 19:45:39,394][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.44
+[2025-12-20 19:45:39,394][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 59.36
+[2025-12-20 19:45:39,394][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 69.90
+[2025-12-20 19:45:39,394][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 84.79
+
+[2025-12-20 19:45:40,099][    INFO] ===========> Epoch: 22, LR: 0.01509, Previous best IoU: 79.68
+[2025-12-20 19:45:42,561][    INFO] Iters: 0, Total loss: 0.046, Loss x: 0.039, Loss s: 0.095, Loss fp: 0.010, Loss neg: 0.040, Mask ratio: 0.774, Proto W: 1.000
+[2025-12-20 19:45:44,054][    INFO] Iters: 1, Total loss: 0.053, Loss x: 0.033, Loss s: 0.133, Loss fp: 0.015, Loss neg: 0.058, Mask ratio: 0.790, Proto W: 1.000
+[2025-12-20 19:45:44,343][    INFO] ***** Evaluation ***** >>>> Background IoU: 78.56
+[2025-12-20 19:45:44,343][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 54.36
+[2025-12-20 19:45:44,343][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 66.46
+[2025-12-20 19:45:44,343][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 82.92
+
+[2025-12-20 19:45:45,139][    INFO] ===========> Epoch: 23, LR: 0.01486, Previous best IoU: 79.68
+[2025-12-20 19:45:47,581][    INFO] Iters: 0, Total loss: 0.047, Loss x: 0.035, Loss s: 0.104, Loss fp: 0.015, Loss neg: 0.056, Mask ratio: 0.820, Proto W: 1.000
+[2025-12-20 19:45:49,083][    INFO] Iters: 1, Total loss: 0.045, Loss x: 0.035, Loss s: 0.097, Loss fp: 0.014, Loss neg: 0.046, Mask ratio: 0.800, Proto W: 1.000
+[2025-12-20 19:45:49,378][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.74
+[2025-12-20 19:45:49,378][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 49.31
+[2025-12-20 19:45:49,378][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.03
+[2025-12-20 19:45:49,378][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.03
+
+[2025-12-20 19:45:50,066][    INFO] ===========> Epoch: 24, LR: 0.01462, Previous best IoU: 79.68
+[2025-12-20 19:45:52,554][    INFO] Iters: 0, Total loss: 0.050, Loss x: 0.031, Loss s: 0.125, Loss fp: 0.014, Loss neg: 0.043, Mask ratio: 0.859, Proto W: 1.000
+[2025-12-20 19:45:54,056][    INFO] Iters: 1, Total loss: 0.049, Loss x: 0.032, Loss s: 0.117, Loss fp: 0.016, Loss neg: 0.050, Mask ratio: 0.836, Proto W: 1.000
+[2025-12-20 19:45:54,337][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.18
+[2025-12-20 19:45:54,337][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 58.70
+[2025-12-20 19:45:54,337][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 69.44
+[2025-12-20 19:45:54,337][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 84.54
+
+[2025-12-20 19:45:55,035][    INFO] ===========> Epoch: 25, LR: 0.01439, Previous best IoU: 79.68
+[2025-12-20 19:45:57,506][    INFO] Iters: 0, Total loss: 0.062, Loss x: 0.045, Loss s: 0.141, Loss fp: 0.015, Loss neg: 0.054, Mask ratio: 0.846, Proto W: 1.000
+[2025-12-20 19:45:59,011][    INFO] Iters: 1, Total loss: 0.050, Loss x: 0.044, Loss s: 0.098, Loss fp: 0.015, Loss neg: 0.055, Mask ratio: 0.828, Proto W: 1.000
+[2025-12-20 19:45:59,297][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.52
+[2025-12-20 19:45:59,297][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.00
+[2025-12-20 19:45:59,297][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 73.76
+[2025-12-20 19:45:59,297][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.80
+
+[2025-12-20 19:46:00,007][    INFO] ===========> Epoch: 26, LR: 0.01416, Previous best IoU: 79.68
+[2025-12-20 19:46:02,477][    INFO] Iters: 0, Total loss: 0.046, Loss x: 0.053, Loss s: 0.063, Loss fp: 0.014, Loss neg: 0.062, Mask ratio: 0.833, Proto W: 1.000
+[2025-12-20 19:46:03,975][    INFO] Iters: 1, Total loss: 0.044, Loss x: 0.038, Loss s: 0.086, Loss fp: 0.014, Loss neg: 0.055, Mask ratio: 0.841, Proto W: 1.000
+[2025-12-20 19:46:04,260][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.15
+[2025-12-20 19:46:04,260][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 67.35
+[2025-12-20 19:46:04,260][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 75.25
+[2025-12-20 19:46:04,260][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.50
+
+[2025-12-20 19:46:05,007][    INFO] ===========> Epoch: 27, LR: 0.01392, Previous best IoU: 79.68
+[2025-12-20 19:46:07,481][    INFO] Iters: 0, Total loss: 0.037, Loss x: 0.019, Loss s: 0.079, Loss fp: 0.030, Loss neg: 0.060, Mask ratio: 0.843, Proto W: 1.000
+[2025-12-20 19:46:08,984][    INFO] Iters: 1, Total loss: 0.049, Loss x: 0.032, Loss s: 0.110, Loss fp: 0.021, Loss neg: 0.053, Mask ratio: 0.849, Proto W: 1.000
+[2025-12-20 19:46:09,283][    INFO] ***** Evaluation ***** >>>> Background IoU: 84.07
+[2025-12-20 19:46:09,283][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 70.70
+[2025-12-20 19:46:09,283][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 77.39
+[2025-12-20 19:46:09,283][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 88.50
+
+[2025-12-20 19:46:09,976][    INFO] ===========> Epoch: 28, LR: 0.01369, Previous best IoU: 79.68
+[2025-12-20 19:46:12,418][    INFO] Iters: 0, Total loss: 0.052, Loss x: 0.052, Loss s: 0.090, Loss fp: 0.015, Loss neg: 0.060, Mask ratio: 0.815, Proto W: 1.000
+[2025-12-20 19:46:13,922][    INFO] Iters: 1, Total loss: 0.040, Loss x: 0.040, Loss s: 0.066, Loss fp: 0.013, Loss neg: 0.047, Mask ratio: 0.825, Proto W: 1.000
+[2025-12-20 19:46:14,232][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.80
+[2025-12-20 19:46:14,232][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 67.19
+[2025-12-20 19:46:14,232][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.99
+[2025-12-20 19:46:14,232][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.28
+
+[2025-12-20 19:46:14,918][    INFO] ===========> Epoch: 29, LR: 0.01345, Previous best IoU: 79.68
+[2025-12-20 19:46:17,382][    INFO] Iters: 0, Total loss: 0.046, Loss x: 0.026, Loss s: 0.119, Loss fp: 0.011, Loss neg: 0.046, Mask ratio: 0.772, Proto W: 1.000
+[2025-12-20 19:46:18,885][    INFO] Iters: 1, Total loss: 0.042, Loss x: 0.031, Loss s: 0.099, Loss fp: 0.009, Loss neg: 0.044, Mask ratio: 0.855, Proto W: 1.000
+[2025-12-20 19:46:19,171][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.38
+[2025-12-20 19:46:19,171][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.93
+[2025-12-20 19:46:19,171][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.16
+[2025-12-20 19:46:19,171][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.86
+
+[2025-12-20 19:46:20,122][    INFO] ===========> Epoch: 30, LR: 0.01322, Previous best IoU: 79.68
+[2025-12-20 19:46:22,603][    INFO] Iters: 0, Total loss: 0.035, Loss x: 0.036, Loss s: 0.058, Loss fp: 0.010, Loss neg: 0.047, Mask ratio: 0.880, Proto W: 1.000
+[2025-12-20 19:46:24,106][    INFO] Iters: 1, Total loss: 0.057, Loss x: 0.027, Loss s: 0.162, Loss fp: 0.010, Loss neg: 0.049, Mask ratio: 0.863, Proto W: 1.000
+[2025-12-20 19:46:24,399][    INFO] ***** Evaluation ***** >>>> Background IoU: 81.28
+[2025-12-20 19:46:24,399][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 62.39
+[2025-12-20 19:46:24,399][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 71.84
+[2025-12-20 19:46:24,399][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.72
+
+[2025-12-20 19:46:25,232][    INFO] ===========> Epoch: 31, LR: 0.01298, Previous best IoU: 79.68
+[2025-12-20 19:46:27,717][    INFO] Iters: 0, Total loss: 0.056, Loss x: 0.012, Loss s: 0.188, Loss fp: 0.012, Loss neg: 0.054, Mask ratio: 0.907, Proto W: 1.000
+[2025-12-20 19:46:29,215][    INFO] Iters: 1, Total loss: 0.045, Loss x: 0.026, Loss s: 0.116, Loss fp: 0.011, Loss neg: 0.049, Mask ratio: 0.859, Proto W: 1.000
+[2025-12-20 19:46:29,520][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.60
+[2025-12-20 19:46:29,520][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 60.64
+[2025-12-20 19:46:29,520][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 70.62
+[2025-12-20 19:46:29,520][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.06
+
+[2025-12-20 19:46:30,213][    INFO] ===========> Epoch: 32, LR: 0.01275, Previous best IoU: 79.68
+[2025-12-20 19:46:32,690][    INFO] Iters: 0, Total loss: 0.049, Loss x: 0.036, Loss s: 0.111, Loss fp: 0.011, Loss neg: 0.067, Mask ratio: 0.904, Proto W: 1.000
+[2025-12-20 19:46:34,186][    INFO] Iters: 1, Total loss: 0.041, Loss x: 0.025, Loss s: 0.102, Loss fp: 0.009, Loss neg: 0.051, Mask ratio: 0.884, Proto W: 1.000
+[2025-12-20 19:46:34,706][    INFO] ***** Evaluation ***** >>>> Background IoU: 79.13
+[2025-12-20 19:46:34,706][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 56.28
+[2025-12-20 19:46:34,706][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 67.70
+[2025-12-20 19:46:34,706][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 83.55
+
+[2025-12-20 19:46:35,426][    INFO] ===========> Epoch: 33, LR: 0.01251, Previous best IoU: 79.68
+[2025-12-20 19:46:37,915][    INFO] Iters: 0, Total loss: 0.030, Loss x: 0.030, Loss s: 0.050, Loss fp: 0.010, Loss neg: 0.044, Mask ratio: 0.844, Proto W: 1.000
+[2025-12-20 19:46:39,421][    INFO] Iters: 1, Total loss: 0.065, Loss x: 0.029, Loss s: 0.191, Loss fp: 0.011, Loss neg: 0.047, Mask ratio: 0.852, Proto W: 1.000
+[2025-12-20 19:46:39,703][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.15
+[2025-12-20 19:46:39,704][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.92
+[2025-12-20 19:46:39,704][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.04
+[2025-12-20 19:46:39,704][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.73
+
+[2025-12-20 19:46:40,374][    INFO] ===========> Epoch: 34, LR: 0.01227, Previous best IoU: 79.68
+[2025-12-20 19:46:42,837][    INFO] Iters: 0, Total loss: 0.040, Loss x: 0.018, Loss s: 0.112, Loss fp: 0.012, Loss neg: 0.051, Mask ratio: 0.815, Proto W: 1.000
+[2025-12-20 19:46:44,341][    INFO] Iters: 1, Total loss: 0.042, Loss x: 0.023, Loss s: 0.113, Loss fp: 0.011, Loss neg: 0.056, Mask ratio: 0.868, Proto W: 1.000
+[2025-12-20 19:46:44,632][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.10
+[2025-12-20 19:46:44,632][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 70.54
+[2025-12-20 19:46:44,632][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 76.82
+[2025-12-20 19:46:44,632][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.97
+
+[2025-12-20 19:46:45,323][    INFO] ===========> Epoch: 35, LR: 0.01204, Previous best IoU: 79.68
+[2025-12-20 19:46:47,802][    INFO] Iters: 0, Total loss: 0.039, Loss x: 0.029, Loss s: 0.091, Loss fp: 0.009, Loss neg: 0.041, Mask ratio: 0.879, Proto W: 1.000
+[2025-12-20 19:46:49,299][    INFO] Iters: 1, Total loss: 0.039, Loss x: 0.027, Loss s: 0.093, Loss fp: 0.008, Loss neg: 0.040, Mask ratio: 0.880, Proto W: 1.000
+[2025-12-20 19:46:49,589][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.09
+[2025-12-20 19:46:49,589][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 68.96
+[2025-12-20 19:46:49,589][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 75.53
+[2025-12-20 19:46:49,589][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.19
+
+[2025-12-20 19:46:50,299][    INFO] ===========> Epoch: 36, LR: 0.01180, Previous best IoU: 79.68
+[2025-12-20 19:46:52,763][    INFO] Iters: 0, Total loss: 0.026, Loss x: 0.016, Loss s: 0.064, Loss fp: 0.009, Loss neg: 0.033, Mask ratio: 0.803, Proto W: 1.000
+[2025-12-20 19:46:54,260][    INFO] Iters: 1, Total loss: 0.036, Loss x: 0.026, Loss s: 0.081, Loss fp: 0.009, Loss neg: 0.053, Mask ratio: 0.865, Proto W: 1.000
+[2025-12-20 19:46:54,550][    INFO] ***** Evaluation ***** >>>> Background IoU: 81.40
+[2025-12-20 19:46:54,550][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 66.08
+[2025-12-20 19:46:54,551][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 73.74
+[2025-12-20 19:46:54,551][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.35
+
+[2025-12-20 19:46:55,235][    INFO] ===========> Epoch: 37, LR: 0.01156, Previous best IoU: 79.68
+[2025-12-20 19:46:57,720][    INFO] Iters: 0, Total loss: 0.028, Loss x: 0.029, Loss s: 0.043, Loss fp: 0.011, Loss neg: 0.042, Mask ratio: 0.822, Proto W: 1.000
+[2025-12-20 19:46:59,216][    INFO] Iters: 1, Total loss: 0.033, Loss x: 0.023, Loss s: 0.075, Loss fp: 0.011, Loss neg: 0.046, Mask ratio: 0.843, Proto W: 1.000
+[2025-12-20 19:46:59,502][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.39
+[2025-12-20 19:46:59,502][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 61.59
+[2025-12-20 19:46:59,502][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 70.99
+[2025-12-20 19:46:59,502][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.08
+
+[2025-12-20 19:47:00,292][    INFO] ===========> Epoch: 38, LR: 0.01132, Previous best IoU: 79.68
+[2025-12-20 19:47:02,840][    INFO] Iters: 0, Total loss: 0.026, Loss x: 0.024, Loss s: 0.044, Loss fp: 0.014, Loss neg: 0.057, Mask ratio: 0.825, Proto W: 1.000
+[2025-12-20 19:47:04,336][    INFO] Iters: 1, Total loss: 0.030, Loss x: 0.020, Loss s: 0.072, Loss fp: 0.010, Loss neg: 0.046, Mask ratio: 0.881, Proto W: 1.000
+[2025-12-20 19:47:04,632][    INFO] ***** Evaluation ***** >>>> Background IoU: 78.25
+[2025-12-20 19:47:04,633][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 55.75
+[2025-12-20 19:47:04,633][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 67.00
+[2025-12-20 19:47:04,633][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 82.93
+
+[2025-12-20 19:47:05,693][    INFO] ===========> Epoch: 39, LR: 0.01108, Previous best IoU: 79.68
+[2025-12-20 19:47:08,365][    INFO] Iters: 0, Total loss: 0.030, Loss x: 0.016, Loss s: 0.076, Loss fp: 0.011, Loss neg: 0.050, Mask ratio: 0.880, Proto W: 1.000
+[2025-12-20 19:47:09,864][    INFO] Iters: 1, Total loss: 0.033, Loss x: 0.019, Loss s: 0.085, Loss fp: 0.009, Loss neg: 0.043, Mask ratio: 0.873, Proto W: 1.000
+[2025-12-20 19:47:10,175][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.43
+[2025-12-20 19:47:10,175][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 52.38
+[2025-12-20 19:47:10,175][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 64.91
+[2025-12-20 19:47:10,175][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.92
+
+[2025-12-20 19:47:10,884][    INFO] ===========> Epoch: 40, LR: 0.01084, Previous best IoU: 79.68
+[2025-12-20 19:47:13,379][    INFO] Iters: 0, Total loss: 0.025, Loss x: 0.022, Loss s: 0.046, Loss fp: 0.009, Loss neg: 0.051, Mask ratio: 0.909, Proto W: 1.000
+[2025-12-20 19:47:14,875][    INFO] Iters: 1, Total loss: 0.028, Loss x: 0.023, Loss s: 0.058, Loss fp: 0.008, Loss neg: 0.051, Mask ratio: 0.913, Proto W: 1.000
+[2025-12-20 19:47:15,167][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.43
+[2025-12-20 19:47:15,167][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 48.82
+[2025-12-20 19:47:15,167][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 62.62
+[2025-12-20 19:47:15,167][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 80.75
+
+[2025-12-20 19:47:15,882][    INFO] ===========> Epoch: 41, LR: 0.01060, Previous best IoU: 79.68
+[2025-12-20 19:47:18,363][    INFO] Iters: 0, Total loss: 0.023, Loss x: 0.011, Loss s: 0.060, Loss fp: 0.010, Loss neg: 0.046, Mask ratio: 0.877, Proto W: 1.000
+[2025-12-20 19:47:19,867][    INFO] Iters: 1, Total loss: 0.024, Loss x: 0.021, Loss s: 0.047, Loss fp: 0.010, Loss neg: 0.050, Mask ratio: 0.890, Proto W: 1.000
+[2025-12-20 19:47:20,160][    INFO] ***** Evaluation ***** >>>> Background IoU: 75.72
+[2025-12-20 19:47:20,160][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 46.58
+[2025-12-20 19:47:20,160][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 61.15
+[2025-12-20 19:47:20,160][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 79.97
+
+[2025-12-20 19:47:21,343][    INFO] ===========> Epoch: 42, LR: 0.01036, Previous best IoU: 79.68
+[2025-12-20 19:47:23,899][    INFO] Iters: 0, Total loss: 0.031, Loss x: 0.025, Loss s: 0.070, Loss fp: 0.005, Loss neg: 0.035, Mask ratio: 0.943, Proto W: 1.000
+[2025-12-20 19:47:25,405][    INFO] Iters: 1, Total loss: 0.038, Loss x: 0.023, Loss s: 0.095, Loss fp: 0.010, Loss neg: 0.048, Mask ratio: 0.921, Proto W: 1.000
+[2025-12-20 19:47:25,700][    INFO] ***** Evaluation ***** >>>> Background IoU: 74.92
+[2025-12-20 19:47:25,700][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 44.14
+[2025-12-20 19:47:25,700][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 59.53
+[2025-12-20 19:47:25,700][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 79.07
+
+[2025-12-20 19:47:27,044][    INFO] ===========> Epoch: 43, LR: 0.01011, Previous best IoU: 79.68
+[2025-12-20 19:47:29,558][    INFO] Iters: 0, Total loss: 0.049, Loss x: 0.027, Loss s: 0.132, Loss fp: 0.008, Loss neg: 0.063, Mask ratio: 0.934, Proto W: 1.000
+[2025-12-20 19:47:31,063][    INFO] Iters: 1, Total loss: 0.038, Loss x: 0.022, Loss s: 0.098, Loss fp: 0.008, Loss neg: 0.047, Mask ratio: 0.903, Proto W: 1.000
+[2025-12-20 19:47:31,357][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.89
+[2025-12-20 19:47:31,358][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 53.29
+[2025-12-20 19:47:31,358][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 65.59
+[2025-12-20 19:47:31,358][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 82.34
+
+[2025-12-20 19:47:32,581][    INFO] ===========> Epoch: 44, LR: 0.00987, Previous best IoU: 79.68
+[2025-12-20 19:47:35,104][    INFO] Iters: 0, Total loss: 0.015, Loss x: 0.007, Loss s: 0.037, Loss fp: 0.009, Loss neg: 0.036, Mask ratio: 0.836, Proto W: 1.000
+[2025-12-20 19:47:36,599][    INFO] Iters: 1, Total loss: 0.026, Loss x: 0.020, Loss s: 0.058, Loss fp: 0.009, Loss neg: 0.043, Mask ratio: 0.885, Proto W: 1.000
+[2025-12-20 19:47:36,891][    INFO] ***** Evaluation ***** >>>> Background IoU: 81.04
+[2025-12-20 19:47:36,891][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 63.06
+[2025-12-20 19:47:36,891][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 72.05
+[2025-12-20 19:47:36,891][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.67
+
+[2025-12-20 19:47:37,642][    INFO] ===========> Epoch: 45, LR: 0.00963, Previous best IoU: 79.68
+[2025-12-20 19:47:40,136][    INFO] Iters: 0, Total loss: 0.038, Loss x: 0.019, Loss s: 0.106, Loss fp: 0.007, Loss neg: 0.040, Mask ratio: 0.909, Proto W: 1.000
+[2025-12-20 19:47:41,632][    INFO] Iters: 1, Total loss: 0.038, Loss x: 0.019, Loss s: 0.105, Loss fp: 0.008, Loss neg: 0.050, Mask ratio: 0.907, Proto W: 1.000
+[2025-12-20 19:47:41,949][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.30
+[2025-12-20 19:47:41,949][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 66.67
+[2025-12-20 19:47:41,949][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.49
+[2025-12-20 19:47:41,949][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.93
+
+[2025-12-20 19:47:43,084][    INFO] ===========> Epoch: 46, LR: 0.00938, Previous best IoU: 79.68
+[2025-12-20 19:47:45,631][    INFO] Iters: 0, Total loss: 0.039, Loss x: 0.023, Loss s: 0.102, Loss fp: 0.009, Loss neg: 0.058, Mask ratio: 0.901, Proto W: 1.000
+[2025-12-20 19:47:47,136][    INFO] Iters: 1, Total loss: 0.032, Loss x: 0.018, Loss s: 0.082, Loss fp: 0.009, Loss neg: 0.062, Mask ratio: 0.917, Proto W: 1.000
+[2025-12-20 19:47:47,424][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.47
+[2025-12-20 19:47:47,425][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 69.46
+[2025-12-20 19:47:47,425][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 76.47
+[2025-12-20 19:47:47,425][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.99
+
+[2025-12-20 19:47:48,160][    INFO] ===========> Epoch: 47, LR: 0.00914, Previous best IoU: 79.68
+[2025-12-20 19:47:50,684][    INFO] Iters: 0, Total loss: 0.040, Loss x: 0.029, Loss s: 0.092, Loss fp: 0.010, Loss neg: 0.049, Mask ratio: 0.884, Proto W: 1.000
+[2025-12-20 19:47:52,180][    INFO] Iters: 1, Total loss: 0.037, Loss x: 0.020, Loss s: 0.097, Loss fp: 0.009, Loss neg: 0.043, Mask ratio: 0.878, Proto W: 1.000
+[2025-12-20 19:47:52,484][    INFO] ***** Evaluation ***** >>>> Background IoU: 84.23
+[2025-12-20 19:47:52,485][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 71.55
+[2025-12-20 19:47:52,485][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 77.89
+[2025-12-20 19:47:52,485][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 88.71
+
+[2025-12-20 19:47:53,192][    INFO] ===========> Epoch: 48, LR: 0.00889, Previous best IoU: 79.68
+[2025-12-20 19:47:55,709][    INFO] Iters: 0, Total loss: 0.031, Loss x: 0.021, Loss s: 0.073, Loss fp: 0.007, Loss neg: 0.054, Mask ratio: 0.929, Proto W: 1.000
+[2025-12-20 19:47:57,212][    INFO] Iters: 1, Total loss: 0.027, Loss x: 0.019, Loss s: 0.064, Loss fp: 0.007, Loss neg: 0.049, Mask ratio: 0.910, Proto W: 1.000
+[2025-12-20 19:47:57,507][    INFO] ***** Evaluation ***** >>>> Background IoU: 84.09
+[2025-12-20 19:47:57,507][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 71.07
+[2025-12-20 19:47:57,507][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 77.58
+[2025-12-20 19:47:57,507][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 88.56
+
+[2025-12-20 19:47:58,248][    INFO] ===========> Epoch: 49, LR: 0.00864, Previous best IoU: 79.68
+[2025-12-20 19:48:00,754][    INFO] Iters: 0, Total loss: 0.021, Loss x: 0.023, Loss s: 0.029, Loss fp: 0.008, Loss neg: 0.057, Mask ratio: 0.918, Proto W: 1.000
+[2025-12-20 19:48:02,260][    INFO] Iters: 1, Total loss: 0.022, Loss x: 0.018, Loss s: 0.046, Loss fp: 0.008, Loss neg: 0.049, Mask ratio: 0.908, Proto W: 1.000
+[2025-12-20 19:48:02,567][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.95
+[2025-12-20 19:48:02,567][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 69.75
+[2025-12-20 19:48:02,567][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 76.85
+[2025-12-20 19:48:02,567][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 88.28
+
+[2025-12-20 19:48:03,321][    INFO] ===========> Epoch: 50, LR: 0.00840, Previous best IoU: 79.68
+[2025-12-20 19:48:05,777][    INFO] Iters: 0, Total loss: 0.052, Loss x: 0.019, Loss s: 0.165, Loss fp: 0.006, Loss neg: 0.040, Mask ratio: 0.928, Proto W: 1.000
+[2025-12-20 19:48:07,278][    INFO] Iters: 1, Total loss: 0.042, Loss x: 0.018, Loss s: 0.123, Loss fp: 0.007, Loss neg: 0.048, Mask ratio: 0.922, Proto W: 1.000
+[2025-12-20 19:48:07,614][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.56
+[2025-12-20 19:48:07,615][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 64.98
+[2025-12-20 19:48:07,615][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 73.77
+[2025-12-20 19:48:07,615][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 86.82
+
+[2025-12-20 19:48:08,334][    INFO] ===========> Epoch: 51, LR: 0.00815, Previous best IoU: 79.68
+[2025-12-20 19:48:10,827][    INFO] Iters: 0, Total loss: 0.024, Loss x: 0.016, Loss s: 0.053, Loss fp: 0.011, Loss neg: 0.063, Mask ratio: 0.875, Proto W: 1.000
+[2025-12-20 19:48:12,324][    INFO] Iters: 1, Total loss: 0.031, Loss x: 0.027, Loss s: 0.058, Loss fp: 0.010, Loss neg: 0.054, Mask ratio: 0.887, Proto W: 1.000
+[2025-12-20 19:48:12,623][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.19
+[2025-12-20 19:48:12,623][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 66.49
+[2025-12-20 19:48:12,623][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.84
+[2025-12-20 19:48:12,623][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.40
+
+[2025-12-20 19:48:13,320][    INFO] ===========> Epoch: 52, LR: 0.00790, Previous best IoU: 79.68
+[2025-12-20 19:48:15,809][    INFO] Iters: 0, Total loss: 0.050, Loss x: 0.016, Loss s: 0.160, Loss fp: 0.008, Loss neg: 0.047, Mask ratio: 0.904, Proto W: 1.000
+[2025-12-20 19:48:17,305][    INFO] Iters: 1, Total loss: 0.049, Loss x: 0.022, Loss s: 0.142, Loss fp: 0.008, Loss neg: 0.050, Mask ratio: 0.900, Proto W: 1.000
+[2025-12-20 19:48:17,605][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.65
+[2025-12-20 19:48:17,605][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 67.65
+[2025-12-20 19:48:17,605][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 75.65
+[2025-12-20 19:48:17,605][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.82
+
+[2025-12-20 19:48:18,332][    INFO] ===========> Epoch: 53, LR: 0.00765, Previous best IoU: 79.68
+[2025-12-20 19:48:20,824][    INFO] Iters: 0, Total loss: 0.047, Loss x: 0.023, Loss s: 0.133, Loss fp: 0.008, Loss neg: 0.055, Mask ratio: 0.912, Proto W: 1.000
+[2025-12-20 19:48:22,330][    INFO] Iters: 1, Total loss: 0.045, Loss x: 0.017, Loss s: 0.139, Loss fp: 0.007, Loss neg: 0.045, Mask ratio: 0.911, Proto W: 1.000
+[2025-12-20 19:48:22,638][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.10
+[2025-12-20 19:48:22,639][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 66.29
+[2025-12-20 19:48:22,639][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.70
+[2025-12-20 19:48:22,639][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.32
+
+[2025-12-20 19:48:23,329][    INFO] ===========> Epoch: 54, LR: 0.00740, Previous best IoU: 79.68
+[2025-12-20 19:48:25,833][    INFO] Iters: 0, Total loss: 0.035, Loss x: 0.022, Loss s: 0.084, Loss fp: 0.010, Loss neg: 0.059, Mask ratio: 0.895, Proto W: 1.000
+[2025-12-20 19:48:27,339][    INFO] Iters: 1, Total loss: 0.027, Loss x: 0.016, Loss s: 0.070, Loss fp: 0.008, Loss neg: 0.053, Mask ratio: 0.916, Proto W: 1.000
+[2025-12-20 19:48:27,650][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.41
+[2025-12-20 19:48:27,650][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 67.48
+[2025-12-20 19:48:27,650][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 75.44
+[2025-12-20 19:48:27,650][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.66
+
+[2025-12-20 19:48:28,561][    INFO] ===========> Epoch: 55, LR: 0.00715, Previous best IoU: 79.68
+[2025-12-20 19:48:31,071][    INFO] Iters: 0, Total loss: 0.029, Loss x: 0.016, Loss s: 0.076, Loss fp: 0.008, Loss neg: 0.048, Mask ratio: 0.936, Proto W: 1.000
+[2025-12-20 19:48:32,566][    INFO] Iters: 1, Total loss: 0.039, Loss x: 0.030, Loss s: 0.088, Loss fp: 0.007, Loss neg: 0.050, Mask ratio: 0.925, Proto W: 1.000
+[2025-12-20 19:48:32,873][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.89
+[2025-12-20 19:48:32,873][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.97
+[2025-12-20 19:48:32,873][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.43
+[2025-12-20 19:48:32,873][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.15
+
+[2025-12-20 19:48:33,594][    INFO] ===========> Epoch: 56, LR: 0.00689, Previous best IoU: 79.68
+[2025-12-20 19:48:36,062][    INFO] Iters: 0, Total loss: 0.031, Loss x: 0.028, Loss s: 0.058, Loss fp: 0.013, Loss neg: 0.069, Mask ratio: 0.905, Proto W: 1.000
+[2025-12-20 19:48:37,558][    INFO] Iters: 1, Total loss: 0.036, Loss x: 0.026, Loss s: 0.082, Loss fp: 0.010, Loss neg: 0.055, Mask ratio: 0.904, Proto W: 1.000
+[2025-12-20 19:48:37,856][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.39
+[2025-12-20 19:48:37,857][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 59.29
+[2025-12-20 19:48:37,857][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 69.84
+[2025-12-20 19:48:37,857][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 84.74
+
+[2025-12-20 19:48:38,543][    INFO] ===========> Epoch: 57, LR: 0.00664, Previous best IoU: 79.68
+[2025-12-20 19:48:41,028][    INFO] Iters: 0, Total loss: 0.048, Loss x: 0.012, Loss s: 0.162, Loss fp: 0.005, Loss neg: 0.037, Mask ratio: 0.907, Proto W: 1.000
+[2025-12-20 19:48:42,529][    INFO] Iters: 1, Total loss: 0.038, Loss x: 0.016, Loss s: 0.114, Loss fp: 0.006, Loss neg: 0.040, Mask ratio: 0.910, Proto W: 1.000
+[2025-12-20 19:48:42,829][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.68
+[2025-12-20 19:48:42,829][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 52.06
+[2025-12-20 19:48:42,829][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 64.87
+[2025-12-20 19:48:42,829][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 82.03
+
+[2025-12-20 19:48:43,543][    INFO] ===========> Epoch: 58, LR: 0.00639, Previous best IoU: 79.68
+[2025-12-20 19:48:46,026][    INFO] Iters: 0, Total loss: 0.050, Loss x: 0.019, Loss s: 0.157, Loss fp: 0.007, Loss neg: 0.040, Mask ratio: 0.912, Proto W: 1.000
+[2025-12-20 19:48:47,534][    INFO] Iters: 1, Total loss: 0.039, Loss x: 0.016, Loss s: 0.115, Loss fp: 0.008, Loss neg: 0.052, Mask ratio: 0.923, Proto W: 1.000
+[2025-12-20 19:48:47,833][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.53
+[2025-12-20 19:48:47,833][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 51.63
+[2025-12-20 19:48:47,833][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 64.58
+[2025-12-20 19:48:47,833][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.88
+
+[2025-12-20 19:48:48,543][    INFO] ===========> Epoch: 59, LR: 0.00613, Previous best IoU: 79.68
+[2025-12-20 19:48:51,046][    INFO] Iters: 0, Total loss: 0.037, Loss x: 0.047, Loss s: 0.040, Loss fp: 0.013, Loss neg: 0.070, Mask ratio: 0.888, Proto W: 1.000
+[2025-12-20 19:48:52,544][    INFO] Iters: 1, Total loss: 0.028, Loss x: 0.028, Loss s: 0.045, Loss fp: 0.011, Loss neg: 0.061, Mask ratio: 0.905, Proto W: 1.000
+[2025-12-20 19:48:52,847][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.76
+[2025-12-20 19:48:52,847][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 49.40
+[2025-12-20 19:48:52,847][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.08
+[2025-12-20 19:48:52,847][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.06
+
+[2025-12-20 19:48:53,635][    INFO] ===========> Epoch: 60, LR: 0.00587, Previous best IoU: 79.68
+[2025-12-20 19:48:56,137][    INFO] Iters: 0, Total loss: 0.026, Loss x: 0.020, Loss s: 0.055, Loss fp: 0.009, Loss neg: 0.057, Mask ratio: 0.925, Proto W: 1.000
+[2025-12-20 19:48:57,632][    INFO] Iters: 1, Total loss: 0.024, Loss x: 0.015, Loss s: 0.057, Loss fp: 0.009, Loss neg: 0.071, Mask ratio: 0.909, Proto W: 1.000
+[2025-12-20 19:48:57,942][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.27
+[2025-12-20 19:48:57,942][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 50.87
+[2025-12-20 19:48:57,942][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 64.07
+[2025-12-20 19:48:57,942][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.60
+
+[2025-12-20 19:48:58,641][    INFO] ===========> Epoch: 61, LR: 0.00561, Previous best IoU: 79.68
+[2025-12-20 19:49:01,110][    INFO] Iters: 0, Total loss: 0.027, Loss x: 0.016, Loss s: 0.072, Loss fp: 0.006, Loss neg: 0.038, Mask ratio: 0.931, Proto W: 1.000
+[2025-12-20 19:49:02,607][    INFO] Iters: 1, Total loss: 0.026, Loss x: 0.017, Loss s: 0.064, Loss fp: 0.007, Loss neg: 0.040, Mask ratio: 0.923, Proto W: 1.000
+[2025-12-20 19:49:02,901][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.85
+[2025-12-20 19:49:02,901][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 49.63
+[2025-12-20 19:49:02,901][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.24
+[2025-12-20 19:49:02,901][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.15
+
+[2025-12-20 19:49:03,796][    INFO] ===========> Epoch: 62, LR: 0.00535, Previous best IoU: 79.68
+[2025-12-20 19:49:06,299][    INFO] Iters: 0, Total loss: 0.068, Loss x: 0.027, Loss s: 0.208, Loss fp: 0.010, Loss neg: 0.059, Mask ratio: 0.923, Proto W: 1.000
+[2025-12-20 19:49:07,794][    INFO] Iters: 1, Total loss: 0.048, Loss x: 0.021, Loss s: 0.143, Loss fp: 0.008, Loss neg: 0.051, Mask ratio: 0.910, Proto W: 1.000
+[2025-12-20 19:49:08,072][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.89
+[2025-12-20 19:49:08,072][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 49.74
+[2025-12-20 19:49:08,072][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.31
+[2025-12-20 19:49:08,073][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.19
+
+[2025-12-20 19:49:08,779][    INFO] ===========> Epoch: 63, LR: 0.00509, Previous best IoU: 79.68
+[2025-12-20 19:49:11,339][    INFO] Iters: 0, Total loss: 0.026, Loss x: 0.019, Loss s: 0.056, Loss fp: 0.009, Loss neg: 0.059, Mask ratio: 0.904, Proto W: 1.000
+[2025-12-20 19:49:12,838][    INFO] Iters: 1, Total loss: 0.024, Loss x: 0.017, Loss s: 0.058, Loss fp: 0.006, Loss neg: 0.047, Mask ratio: 0.932, Proto W: 1.000
+[2025-12-20 19:49:13,149][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.51
+[2025-12-20 19:49:13,149][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 51.48
+[2025-12-20 19:49:13,149][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 64.50
+[2025-12-20 19:49:13,149][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.84
+
+[2025-12-20 19:49:13,873][    INFO] ===========> Epoch: 64, LR: 0.00483, Previous best IoU: 79.68
+[2025-12-20 19:49:16,335][    INFO] Iters: 0, Total loss: 0.033, Loss x: 0.029, Loss s: 0.061, Loss fp: 0.010, Loss neg: 0.063, Mask ratio: 0.906, Proto W: 1.000
+[2025-12-20 19:49:17,840][    INFO] Iters: 1, Total loss: 0.034, Loss x: 0.025, Loss s: 0.074, Loss fp: 0.010, Loss neg: 0.060, Mask ratio: 0.909, Proto W: 1.000
+[2025-12-20 19:49:18,148][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.19
+[2025-12-20 19:49:18,148][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 50.58
+[2025-12-20 19:49:18,148][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.89
+[2025-12-20 19:49:18,148][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.51
+
+[2025-12-20 19:49:18,837][    INFO] ===========> Epoch: 65, LR: 0.00457, Previous best IoU: 79.68
+[2025-12-20 19:49:21,345][    INFO] Iters: 0, Total loss: 0.029, Loss x: 0.016, Loss s: 0.078, Loss fp: 0.005, Loss neg: 0.041, Mask ratio: 0.942, Proto W: 1.000
+[2025-12-20 19:49:22,841][    INFO] Iters: 1, Total loss: 0.024, Loss x: 0.017, Loss s: 0.055, Loss fp: 0.005, Loss neg: 0.038, Mask ratio: 0.933, Proto W: 1.000
+[2025-12-20 19:49:23,140][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.69
+[2025-12-20 19:49:23,140][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 49.17
+[2025-12-20 19:49:23,140][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 62.93
+[2025-12-20 19:49:23,140][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 80.98
+
+[2025-12-20 19:49:23,869][    INFO] ===========> Epoch: 66, LR: 0.00430, Previous best IoU: 79.68
+[2025-12-20 19:49:26,409][    INFO] Iters: 0, Total loss: 0.032, Loss x: 0.038, Loss s: 0.043, Loss fp: 0.008, Loss neg: 0.048, Mask ratio: 0.899, Proto W: 1.000
+[2025-12-20 19:49:27,907][    INFO] Iters: 1, Total loss: 0.029, Loss x: 0.023, Loss s: 0.063, Loss fp: 0.007, Loss neg: 0.050, Mask ratio: 0.918, Proto W: 1.000
+[2025-12-20 19:49:28,196][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.55
+[2025-12-20 19:49:28,196][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 48.77
+[2025-12-20 19:49:28,196][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 62.66
+[2025-12-20 19:49:28,196][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 80.83
+
+[2025-12-20 19:49:28,878][    INFO] ===========> Epoch: 67, LR: 0.00403, Previous best IoU: 79.68
+[2025-12-20 19:49:31,357][    INFO] Iters: 0, Total loss: 0.031, Loss x: 0.030, Loss s: 0.055, Loss fp: 0.009, Loss neg: 0.042, Mask ratio: 0.884, Proto W: 1.000
+[2025-12-20 19:49:32,852][    INFO] Iters: 1, Total loss: 0.038, Loss x: 0.028, Loss s: 0.083, Loss fp: 0.013, Loss neg: 0.067, Mask ratio: 0.892, Proto W: 1.000
+[2025-12-20 19:49:33,153][    INFO] ***** Evaluation ***** >>>> Background IoU: 76.39
+[2025-12-20 19:49:33,153][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 48.31
+[2025-12-20 19:49:33,153][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 62.35
+[2025-12-20 19:49:33,153][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 80.66
+
+[2025-12-20 19:49:33,823][    INFO] ===========> Epoch: 68, LR: 0.00376, Previous best IoU: 79.68
+[2025-12-20 19:49:36,328][    INFO] Iters: 0, Total loss: 0.026, Loss x: 0.014, Loss s: 0.071, Loss fp: 0.006, Loss neg: 0.057, Mask ratio: 0.953, Proto W: 1.000
+[2025-12-20 19:49:37,823][    INFO] Iters: 1, Total loss: 0.041, Loss x: 0.013, Loss s: 0.131, Loss fp: 0.007, Loss neg: 0.056, Mask ratio: 0.925, Proto W: 1.000
+[2025-12-20 19:49:38,124][    INFO] ***** Evaluation ***** >>>> Background IoU: 77.16
+[2025-12-20 19:49:38,124][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 50.50
+[2025-12-20 19:49:38,124][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 63.83
+[2025-12-20 19:49:38,124][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 81.48
+
+[2025-12-20 19:49:38,810][    INFO] ===========> Epoch: 69, LR: 0.00349, Previous best IoU: 79.68
+[2025-12-20 19:49:41,307][    INFO] Iters: 0, Total loss: 0.031, Loss x: 0.025, Loss s: 0.065, Loss fp: 0.007, Loss neg: 0.034, Mask ratio: 0.901, Proto W: 1.000
+[2025-12-20 19:49:42,804][    INFO] Iters: 1, Total loss: 0.029, Loss x: 0.019, Loss s: 0.067, Loss fp: 0.009, Loss neg: 0.057, Mask ratio: 0.901, Proto W: 1.000
+[2025-12-20 19:49:43,101][    INFO] ***** Evaluation ***** >>>> Background IoU: 78.07
+[2025-12-20 19:49:43,101][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 53.02
+[2025-12-20 19:49:43,101][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 65.54
+[2025-12-20 19:49:43,101][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 82.42
+
+[2025-12-20 19:49:43,814][    INFO] ===========> Epoch: 70, LR: 0.00322, Previous best IoU: 79.68
+[2025-12-20 19:49:46,315][    INFO] Iters: 0, Total loss: 0.036, Loss x: 0.031, Loss s: 0.069, Loss fp: 0.012, Loss neg: 0.065, Mask ratio: 0.882, Proto W: 1.000
+[2025-12-20 19:49:47,820][    INFO] Iters: 1, Total loss: 0.034, Loss x: 0.025, Loss s: 0.077, Loss fp: 0.009, Loss neg: 0.056, Mask ratio: 0.919, Proto W: 1.000
+[2025-12-20 19:49:48,134][    INFO] ***** Evaluation ***** >>>> Background IoU: 80.72
+[2025-12-20 19:49:48,134][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 60.09
+[2025-12-20 19:49:48,134][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 70.41
+[2025-12-20 19:49:48,134][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.06
+
+[2025-12-20 19:49:48,826][    INFO] ===========> Epoch: 71, LR: 0.00294, Previous best IoU: 79.68
+[2025-12-20 19:49:51,311][    INFO] Iters: 0, Total loss: 0.040, Loss x: 0.013, Loss s: 0.125, Loss fp: 0.008, Loss neg: 0.069, Mask ratio: 0.913, Proto W: 1.000
+[2025-12-20 19:49:52,806][    INFO] Iters: 1, Total loss: 0.029, Loss x: 0.018, Loss s: 0.073, Loss fp: 0.007, Loss neg: 0.058, Mask ratio: 0.933, Proto W: 1.000
+[2025-12-20 19:49:53,149][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.85
+[2025-12-20 19:49:53,149][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.52
+[2025-12-20 19:49:53,149][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.19
+[2025-12-20 19:49:53,149][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.07
+
+[2025-12-20 19:49:53,859][    INFO] ===========> Epoch: 72, LR: 0.00266, Previous best IoU: 79.68
+[2025-12-20 19:49:56,339][    INFO] Iters: 0, Total loss: 0.049, Loss x: 0.052, Loss s: 0.084, Loss fp: 0.008, Loss neg: 0.056, Mask ratio: 0.918, Proto W: 1.000
+[2025-12-20 19:49:57,835][    INFO] Iters: 1, Total loss: 0.069, Loss x: 0.050, Loss s: 0.167, Loss fp: 0.010, Loss neg: 0.051, Mask ratio: 0.903, Proto W: 1.000
+[2025-12-20 19:49:58,134][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.62
+[2025-12-20 19:49:58,134][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 67.71
+[2025-12-20 19:49:58,134][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 75.67
+[2025-12-20 19:49:58,134][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.81
+
+[2025-12-20 19:49:58,836][    INFO] ===========> Epoch: 73, LR: 0.00238, Previous best IoU: 79.68
+[2025-12-20 19:50:01,340][    INFO] Iters: 0, Total loss: 0.017, Loss x: 0.019, Loss s: 0.024, Loss fp: 0.005, Loss neg: 0.044, Mask ratio: 0.954, Proto W: 1.000
+[2025-12-20 19:50:02,845][    INFO] Iters: 1, Total loss: 0.023, Loss x: 0.018, Loss s: 0.047, Loss fp: 0.008, Loss neg: 0.054, Mask ratio: 0.930, Proto W: 1.000
+[2025-12-20 19:50:03,147][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.93
+[2025-12-20 19:50:03,147][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.92
+[2025-12-20 19:50:03,147][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.42
+[2025-12-20 19:50:03,147][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.17
+
+[2025-12-20 19:50:03,939][    INFO] ===========> Epoch: 74, LR: 0.00209, Previous best IoU: 79.68
+[2025-12-20 19:50:06,478][    INFO] Iters: 0, Total loss: 0.057, Loss x: 0.019, Loss s: 0.183, Loss fp: 0.008, Loss neg: 0.048, Mask ratio: 0.917, Proto W: 1.000
+[2025-12-20 19:50:07,974][    INFO] Iters: 1, Total loss: 0.053, Loss x: 0.021, Loss s: 0.161, Loss fp: 0.007, Loss neg: 0.045, Mask ratio: 0.926, Proto W: 1.000
+[2025-12-20 19:50:08,262][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.99
+[2025-12-20 19:50:08,262][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 68.89
+[2025-12-20 19:50:08,262][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 76.44
+[2025-12-20 19:50:08,262][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 88.18
+
+[2025-12-20 19:50:08,993][    INFO] ===========> Epoch: 75, LR: 0.00180, Previous best IoU: 79.68
+[2025-12-20 19:50:11,538][    INFO] Iters: 0, Total loss: 0.019, Loss x: 0.014, Loss s: 0.041, Loss fp: 0.005, Loss neg: 0.049, Mask ratio: 0.946, Proto W: 1.000
+[2025-12-20 19:50:13,046][    INFO] Iters: 1, Total loss: 0.024, Loss x: 0.015, Loss s: 0.061, Loss fp: 0.006, Loss neg: 0.052, Mask ratio: 0.935, Proto W: 1.000
+[2025-12-20 19:50:13,348][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.87
+[2025-12-20 19:50:13,348][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.60
+[2025-12-20 19:50:13,348][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.23
+[2025-12-20 19:50:13,348][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.09
+
+[2025-12-20 19:50:14,090][    INFO] ===========> Epoch: 76, LR: 0.00150, Previous best IoU: 79.68
+[2025-12-20 19:50:16,551][    INFO] Iters: 0, Total loss: 0.034, Loss x: 0.015, Loss s: 0.098, Loss fp: 0.007, Loss neg: 0.041, Mask ratio: 0.914, Proto W: 1.000
+[2025-12-20 19:50:18,046][    INFO] Iters: 1, Total loss: 0.031, Loss x: 0.018, Loss s: 0.081, Loss fp: 0.006, Loss neg: 0.049, Mask ratio: 0.944, Proto W: 1.000
+[2025-12-20 19:50:18,351][    INFO] ***** Evaluation ***** >>>> Background IoU: 83.66
+[2025-12-20 19:50:18,352][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 67.57
+[2025-12-20 19:50:18,352][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 75.62
+[2025-12-20 19:50:18,352][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.81
+
+[2025-12-20 19:50:19,109][    INFO] ===========> Epoch: 77, LR: 0.00120, Previous best IoU: 79.68
+[2025-12-20 19:50:21,651][    INFO] Iters: 0, Total loss: 0.035, Loss x: 0.014, Loss s: 0.107, Loss fp: 0.006, Loss neg: 0.046, Mask ratio: 0.900, Proto W: 1.000
+[2025-12-20 19:50:23,156][    INFO] Iters: 1, Total loss: 0.032, Loss x: 0.017, Loss s: 0.087, Loss fp: 0.007, Loss neg: 0.052, Mask ratio: 0.910, Proto W: 1.000
+[2025-12-20 19:50:23,489][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.89
+[2025-12-20 19:50:23,490][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.59
+[2025-12-20 19:50:23,490][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.24
+[2025-12-20 19:50:23,490][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.10
+
+[2025-12-20 19:50:24,223][    INFO] ===========> Epoch: 78, LR: 0.00088, Previous best IoU: 79.68
+[2025-12-20 19:50:26,740][    INFO] Iters: 0, Total loss: 0.026, Loss x: 0.020, Loss s: 0.056, Loss fp: 0.009, Loss neg: 0.078, Mask ratio: 0.935, Proto W: 1.000
+[2025-12-20 19:50:28,243][    INFO] Iters: 1, Total loss: 0.026, Loss x: 0.020, Loss s: 0.055, Loss fp: 0.008, Loss neg: 0.063, Mask ratio: 0.928, Proto W: 1.000
+[2025-12-20 19:50:28,535][    INFO] ***** Evaluation ***** >>>> Background IoU: 82.93
+[2025-12-20 19:50:28,535][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 65.67
+[2025-12-20 19:50:28,535][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 74.30
+[2025-12-20 19:50:28,535][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 87.13
+
+[2025-12-20 19:50:29,314][    INFO] ===========> Epoch: 79, LR: 0.00056, Previous best IoU: 79.68
+[2025-12-20 19:50:31,795][    INFO] Iters: 0, Total loss: 0.021, Loss x: 0.011, Loss s: 0.053, Loss fp: 0.007, Loss neg: 0.049, Mask ratio: 0.947, Proto W: 1.000
+[2025-12-20 19:50:33,297][    INFO] Iters: 1, Total loss: 0.029, Loss x: 0.026, Loss s: 0.054, Loss fp: 0.011, Loss neg: 0.065, Mask ratio: 0.917, Proto W: 1.000
+[2025-12-20 19:50:33,613][    INFO] ***** Evaluation ***** >>>> Background IoU: 81.48
+[2025-12-20 19:50:33,613][    INFO] ***** Evaluation ***** >>>> Foreground IoU: 62.03
+[2025-12-20 19:50:33,613][    INFO] ***** Evaluation ***** >>>> Macro IoU (Main Metric): 71.76
+[2025-12-20 19:50:33,614][    INFO] ***** Evaluation ***** >>>> Overall Accuracy: 85.78
+
+[2025-12-20 19:50:35,694][    INFO] ************ Final Test Results ************
+[2025-12-20 19:50:35,694][    INFO] ***** Test ***** >>>> Background IoU: 93.93
+[2025-12-20 19:50:35,694][    INFO] ***** Test ***** >>>> Foreground IoU: 86.13
+[2025-12-20 19:50:35,694][    INFO] ***** Test ***** >>>> Macro IoU (Main Metric): 90.03
+[2025-12-20 19:50:35,694][    INFO] ***** Test ***** >>>> Overall Accuracy: 95.59
+
+[2025-12-20 19:50:35,705][    INFO] Test results saved to ./results/deeplabv3plus/resnet101/medellin/ours_sat_only/30/results.txt

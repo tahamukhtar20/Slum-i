@@ -6,6 +6,7 @@ import time
 
 import torch
 from torch import nn
+# from torch.nn import functional as F
 from torch.optim import SGD
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
@@ -24,8 +25,134 @@ parser.add_argument('--config', type=str, required=True)
 parser.add_argument('--labeled-id-path', type=str, required=True)
 parser.add_argument('--unlabeled-id-path', type=str, required=True)
 parser.add_argument('--save-path', type=str, required=True)
-parser.add_argument('--results-dir', type=str, default='./results')
+parser.add_argument('--results-dir', type=str, default='./tmp/results')
 parser.add_argument('--split', type=str, default='10')
+
+# import matplotlib.pyplot as plt
+# from sklearn.decomposition import PCA
+# import numpy as np
+
+# import torch
+# import torch.nn.functional as F
+# import numpy as np
+# import os
+# import matplotlib.pyplot as plt
+# from sklearn.decomposition import PCA
+
+# def verify_clusters_with_ground_truth(model, val_loader, proto_bank, save_path, epoch, device='cuda'):
+#     """
+#     Scans validation data starting from a RANDOM batch offset to ensure
+#     different samples are visualized every epoch.
+#     """
+#     model.eval()
+    
+#     bank_queue = proto_bank.queue.detach().cpu().numpy() 
+#     num_classes, queue_size, feat_dim = bank_queue.shape
+#     bank_flat = bank_queue.reshape(-1, feat_dim)
+#     bank_labels = np.repeat(np.arange(num_classes), queue_size)
+
+#     gt_feats_dict = {0: [], 1: []}
+#     counts = {0: 0, 1: 0}
+#     REQUIRED_SAMPLES = 50 
+    
+#     try:
+#         total_batches = len(val_loader)
+#     except TypeError:
+#         total_batches = 50 
+        
+#     max_start = max(0, total_batches - 25)
+#     start_idx = np.random.randint(0, max_start) if max_start > 0 else 0
+    
+#     batches_scanned = 0
+#     max_scan_limit = 20
+
+#     print(f"[INFO] Verification: Skipping first {start_idx} batches to find fresh samples...")
+
+#     with torch.no_grad():
+#         for i, batch in enumerate(val_loader):
+#             if i < start_idx:
+#                 continue
+
+#             if batches_scanned > max_scan_limit:
+#                 break
+#             batches_scanned += 1
+
+#             if len(batch) == 3:
+#                 img, mask, _ = batch
+#             else:
+#                 img, mask = batch
+                
+#             img = img.to(device)
+#             mask = mask.to(device)
+
+#             if (mask == 1).sum() == 0 and counts[1] >= REQUIRED_SAMPLES:
+#                 continue
+
+#             _, features = model(img, return_feature=True)
+#             features = F.normalize(features, dim=1)
+            
+#             mask_small = F.interpolate(mask.float().unsqueeze(1), size=features.shape[2:], mode='nearest').squeeze(1).long()
+            
+#             features = features.permute(0, 2, 3, 1).reshape(-1, feat_dim)
+#             mask_small = mask_small.flatten()
+
+#             for c in [0, 1]:
+#                 if counts[c] >= REQUIRED_SAMPLES: 
+#                     continue 
+
+#                 class_mask = (mask_small == c)
+#                 if class_mask.sum() > 0:
+#                     f = features[class_mask]
+                    
+#                     if f.shape[0] > 50:
+#                         idx = torch.randperm(f.shape[0])[:50]
+#                         f = f[idx]
+                    
+#                     f_np = f.cpu().numpy()
+#                     gt_feats_dict[c].append(f_np)
+#                     counts[c] += f_np.shape[0]
+
+#             if counts[0] >= REQUIRED_SAMPLES and counts[1] >= REQUIRED_SAMPLES:
+#                 break
+
+#     all_feats = []
+#     all_labels = []
+    
+#     for c in [0, 1]:
+#         if gt_feats_dict[c]:
+#             c_feats = np.concatenate(gt_feats_dict[c], axis=0)
+#             all_feats.append(c_feats)
+#             all_labels.append(np.full(c_feats.shape[0], c))
+    
+#     if not all_feats:
+#         print("[Warning] No valid GT features found after scanning.")
+#         return
+
+#     gt_data = np.concatenate(all_feats, axis=0)
+#     gt_labels_flat = np.concatenate(all_labels, axis=0)
+
+#     pca = PCA(n_components=2)
+#     bank_projected = pca.fit_transform(bank_flat)
+#     gt_projected = pca.transform(gt_data)
+    
+#     plt.figure(figsize=(10, 8))
+#     plt.scatter(bank_projected[:, 0], bank_projected[:, 1], c=bank_labels, cmap='coolwarm', alpha=0.3, s=10, label='Bank')
+    
+#     bg_idx = (gt_labels_flat == 0)
+#     if bg_idx.any():
+#         plt.scatter(gt_projected[bg_idx, 0], gt_projected[bg_idx, 1], c='blue', marker='*', s=150, edgecolors='black', label='REAL Background')
+    
+#     slum_idx = (gt_labels_flat == 1)
+#     if slum_idx.any():
+#         plt.scatter(gt_projected[slum_idx, 0], gt_projected[slum_idx, 1], c='red', marker='*', s=150, edgecolors='black', label='REAL Slum')
+#     else:
+#         plt.text(0, 0, "NO SLUMS FOUND", fontsize=12, color='red', ha='center')
+
+#     plt.legend()
+#     plt.title(f"Verification (Epoch {epoch})")
+#     plt.savefig(os.path.join(save_path, f'verification_plot_{epoch}.png'))
+#     plt.close()
+#     print(f"[INFO] Verified with {counts[0]} BG and {counts[1]} Slum samples.")
 
 def main():
     init_seeds(42)
@@ -245,6 +372,7 @@ def main():
                         i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_loss_w_fp.avg, total_mask_ratio.avg, total_proto_weight.avg))
 
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg)
+        # verify_clusters_with_ground_truth(model, valloader, proto_bank, args.save_path, epoch, device='cuda')
 
         logger.info('***** Evaluation ***** >>>> Background IoU: {:.2f}'.format(iou_class[0]))
         logger.info('***** Evaluation ***** >>>> Foreground IoU: {:.2f}'.format(iou_class[1]))
