@@ -16,7 +16,8 @@ import yaml
 from dataset.semi import SemiDataset
 from model.semseg.dpt import DPT
 from supervised import evaluate, init_seeds, seed_worker, test
-from util.utils import init_log, AverageMeter
+from util.utils import ClassAwareThreshold, init_log, AverageMeter
+from util.prototype import PrototypeBank
 
 from thop import profile
 
@@ -86,6 +87,10 @@ def main():
 
     logger.info('Total params (thop): {:.1f}M'.format(model_params_m))
     logger.info('Inference FLOPs (thop): {:.2f}G on size {}x{}'.format(model_flops_g, H, W))
+    
+    proto_bank = PrototypeBank(num_classes=2, power=2, feat_dim=model.channels[0], queue_size=2000, device='cuda')
+    adaptive_thresh = ClassAwareThreshold(num_classes=2, momentum=0.999, min_thresh=0.6, max_thresh=0.95)
+    
     model.train()
     
     model_ema = deepcopy(model)
@@ -137,6 +142,7 @@ def main():
         total_loss_x = AverageMeter()
         total_loss_s = AverageMeter()
         total_mask_ratio = AverageMeter()
+        total_proto_weight = AverageMeter()
 
         loader = zip(trainloader_l, trainloader_u)
         
@@ -150,14 +156,37 @@ def main():
             ignore_mask, cutmix_box1, cutmix_box2 = ignore_mask.cuda(), cutmix_box1.cuda(), cutmix_box2.cuda()
             
             with torch.no_grad():
-                pred_u_w = model_ema(img_u_w).detach()
+                pred_u_w, feats_u_w = model_ema(img_u_w, return_feature=True)
+                pred_u_w = pred_u_w.detach()
+                feats_u_w = feats_u_w.detach()
+                
                 conf_u_w = pred_u_w.softmax(dim=1).max(dim=1)[0]
                 mask_u_w = pred_u_w.argmax(dim=1)
+                
+                adaptive_thresh.update(conf_u_w, mask_u_w)
+                mask_high_conf = adaptive_thresh.get_mask(conf_u_w, mask_u_w)
+
+                update_mask = mask_u_w.clone()
+                update_mask[~mask_high_conf] = 255
+                
+                proto_bank.update(feats_u_w, update_mask)
+                proto_weights = proto_bank.get_consistency_weight(feats_u_w, mask_u_w)
+            
+            total_proto_weight.update(proto_weights.mean().item())
             
             img_u_s1[cutmix_box1.unsqueeze(1).expand(img_u_s1.shape) == 1] = img_u_s1.flip(0)[cutmix_box1.unsqueeze(1).expand(img_u_s1.shape) == 1]
             img_u_s2[cutmix_box2.unsqueeze(1).expand(img_u_s2.shape) == 1] = img_u_s2.flip(0)[cutmix_box2.unsqueeze(1).expand(img_u_s2.shape) == 1]
             
-            pred_x = model(img_x)
+            proto_weights1 = proto_weights.clone()
+            proto_weights2 = proto_weights.clone()
+            
+            proto_weights1[cutmix_box1 == 1] = proto_weights.flip(0)[cutmix_box1 == 1]
+            proto_weights2[cutmix_box2 == 1] = proto_weights.flip(0)[cutmix_box2 == 1]
+            
+            num_lb = img_x.shape[0]
+            preds_all = model(torch.cat((img_x, img_u_w)))
+            pred_x, _ = preds_all.split([num_lb, num_lb])
+            
             pred_u_s1, pred_u_s2 = model(torch.cat((img_u_s1, img_u_s2)), comp_drop=True).chunk(2)
             
             mask_u_w_cutmixed1, conf_u_w_cutmixed1, ignore_mask_cutmixed1 = mask_u_w.clone(), conf_u_w.clone(), ignore_mask.clone()
@@ -171,15 +200,24 @@ def main():
             conf_u_w_cutmixed2[cutmix_box2 == 1] = conf_u_w.flip(0)[cutmix_box2 == 1]
             ignore_mask_cutmixed2[cutmix_box2 == 1] = ignore_mask.flip(0)[cutmix_box2 == 1]
             
+            mask_valid = mask_high_conf.long()
+            mask_valid_cutmixed1 = mask_valid.clone()
+            mask_valid_cutmixed2 = mask_valid.clone()
+            
+            mask_valid_cutmixed1[cutmix_box1 == 1] = mask_valid.flip(0)[cutmix_box1 == 1]
+            mask_valid_cutmixed2[cutmix_box2 == 1] = mask_valid.flip(0)[cutmix_box2 == 1]
+            
             loss_x = criterion_l(pred_x, mask_x)
 
             loss_u_s1 = criterion_u(pred_u_s1, mask_u_w_cutmixed1)
-            loss_u_s1 = loss_u_s1 * ((conf_u_w_cutmixed1 >= cfg['conf_thresh']) & (ignore_mask_cutmixed1 != 255))
-            loss_u_s1 = loss_u_s1.sum() / (ignore_mask_cutmixed1 != 255).sum().item()
+            consistency_weight1 = mask_valid_cutmixed1 * proto_weights1
+            loss_u_s1 = loss_u_s1 * (consistency_weight1 * (ignore_mask_cutmixed1 != 255))
+            loss_u_s1 = loss_u_s1.sum() / ((ignore_mask_cutmixed1 != 255).sum().item() + 1e-6)
             
             loss_u_s2 = criterion_u(pred_u_s2, mask_u_w_cutmixed2)
-            loss_u_s2 = loss_u_s2 * ((conf_u_w_cutmixed2 >= cfg['conf_thresh']) & (ignore_mask_cutmixed2 != 255))
-            loss_u_s2 = loss_u_s2.sum() / (ignore_mask_cutmixed2 != 255).sum().item()
+            consistency_weight2 = mask_valid_cutmixed2 * proto_weights2
+            loss_u_s2 = loss_u_s2 * (consistency_weight2 * (ignore_mask_cutmixed2 != 255))
+            loss_u_s2 = loss_u_s2.sum() / ((ignore_mask_cutmixed2 != 255).sum().item() + 1e-6)
             
             loss_u_s = (loss_u_s1 + loss_u_s2) / 2.0
             
@@ -192,7 +230,7 @@ def main():
             total_loss.update(loss.item())
             total_loss_x.update(loss_x.item())
             total_loss_s.update(loss_u_s.item())
-            mask_ratio = ((conf_u_w >= cfg['conf_thresh']) & (ignore_mask != 255)).sum().item() / (ignore_mask != 255).sum()
+            mask_ratio = (mask_high_conf & (ignore_mask != 255)).sum().item() / ((ignore_mask != 255).sum() + 1e-6)
             total_mask_ratio.update(mask_ratio.item())
 
             iters = epoch * len(trainloader_u) + i
@@ -211,6 +249,7 @@ def main():
             writer.add_scalar('train/loss_x', loss_x.item(), iters)
             writer.add_scalar('train/loss_s', loss_u_s.item(), iters)
             writer.add_scalar('train/mask_ratio', mask_ratio, iters)
+            writer.add_scalar('train/proto_weight', total_proto_weight.avg, iters)
 
             if len(trainloader_u) == 0:
                 log_frequency = 1
@@ -218,8 +257,8 @@ def main():
                 log_frequency = max(1, len(trainloader_u) // 8) 
             
             if i % log_frequency == 0:
-                logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Mask ratio: '
-                            '{:.3f}'.format(i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_mask_ratio.avg))
+                logger.info('Iters: {:}, Total loss: {:.3f}, Loss x: {:.3f}, Loss s: {:.3f}, Mask ratio: {:.3f}, Proto W: {:.3f}'.format(
+                            i, total_loss.avg, total_loss_x.avg, total_loss_s.avg, total_mask_ratio.avg, total_proto_weight.avg))
         
         iou_class, macro_iou, overall_acc = evaluate(model, valloader, cfg, multiplier=14)
         ema_iou_class, ema_macro_iou, ema_overall_acc = evaluate(model_ema, valloader, cfg, multiplier=14)
@@ -270,8 +309,8 @@ def main():
     total_end_time = time.time()
     total_training_seconds = total_end_time - total_start_time
 
-    test(args, cfg, model, logger, "ours", split=args.split, multiplier=14, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
-    test(args, cfg, model_ema, logger, "ours", split=args.split, suffix='_ema', multiplier=14, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
+    test(args, cfg, model, logger, "ours-dino", split=args.split, multiplier=14, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
+    test(args, cfg, model_ema, logger, "ours-dino", split=args.split, suffix='_ema', multiplier=14, calculate_speed=True, total_training_seconds=total_training_seconds, model_flops_g=model_flops_g, model_params_m=model_params_m, H=H, W=W)
 
 if __name__ == '__main__':
     main()

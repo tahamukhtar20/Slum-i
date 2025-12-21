@@ -2,9 +2,9 @@
 #SBATCH -p RTXA6000
 #SBATCH --job-name=training
 #SBATCH --gpus=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
-#SBATCH --time=08:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+#SBATCH --time=12:00:00
 #SBATCH --container-image=/enroot/nvcr.io_nvidia_pytorch_25.02-py3.sqsh
 #SBATCH --container-workdir=/netscratch/mukhtar/UniMatch
 #SBATCH --container-mounts=/netscratch:/netscratch,/netscratch/mukhtar/UniMatch:/netscratch/mukhtar/UniMatch

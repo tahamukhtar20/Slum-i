@@ -76,13 +76,13 @@ class DPTHead(nn.Module):
         self.scratch.refinenet3 = _make_fusion_block(features, use_bn)
         self.scratch.refinenet4 = _make_fusion_block(features, use_bn)
 
-        self.scratch.output_conv = nn.Sequential(
+        self.scratch.output_conv1 = nn.Sequential(
             nn.Conv2d(features, features, kernel_size=3, stride=1, padding=1),
             nn.ReLU(True),
-            nn.Conv2d(features, nclass, kernel_size=1, stride=1, padding=0)
         )
+        self.scratch.output_conv2 = nn.Conv2d(features, nclass, kernel_size=1, stride=1, padding=0)
     
-    def forward(self, out_features, patch_h, patch_w):
+    def forward(self, out_features, patch_h, patch_w, return_feature=False):
         out = []
         for i, x in enumerate(out_features):
             x = x.permute(0, 2, 1).reshape((x.shape[0], x.shape[-1], patch_h, patch_w))
@@ -104,7 +104,11 @@ class DPTHead(nn.Module):
         path_2 = self.scratch.refinenet2(path_3, layer_2_rn, size=layer_1_rn.shape[2:])
         path_1 = self.scratch.refinenet1(path_2, layer_1_rn)
         
-        out = self.scratch.output_conv(path_1)
+        features = self.scratch.output_conv1(path_1)
+        out = self.scratch.output_conv2(features)
+        
+        if return_feature:
+            return out, features
         
         return out
 
@@ -130,6 +134,8 @@ class DPT(nn.Module):
         self.encoder_size = encoder_size
         self.backbone = DINOv2(model_name=encoder_size)
         
+        self.channels = [features]
+        
         self.head = DPTHead(nclass, self.backbone.embed_dim, features, use_bn, out_channels=out_channels)
         
         self.binomial = torch.distributions.binomial.Binomial(probs=0.5)
@@ -138,7 +144,7 @@ class DPT(nn.Module):
         for p in self.backbone.parameters():
             p.requires_grad = False
     
-    def forward(self, x, comp_drop=False):
+    def forward(self, x, comp_drop=False, return_feature=False):
         patch_h, patch_w = x.shape[-2] // 14, x.shape[-1] // 14
         
         features = self.backbone.get_intermediate_layers(
@@ -160,11 +166,22 @@ class DPT(nn.Module):
             
             features = (feature * dropout_mask.unsqueeze(1) for feature in features)
             
-            out = self.head(features, patch_h, patch_w)
+            if return_feature:
+                out, feat = self.head(features, patch_h, patch_w, return_feature=True)
+                out = F.interpolate(out, (patch_h * 14, patch_w * 14), mode='bilinear', align_corners=True)
+                feat = F.interpolate(feat, (patch_h * 14, patch_w * 14), mode='bilinear', align_corners=True)
+                return out, feat
             
+            out = self.head(features, patch_h, patch_w)
             out = F.interpolate(out, (patch_h * 14, patch_w * 14), mode='bilinear', align_corners=True)
             
             return out
+        
+        if return_feature:
+            out, feat = self.head(features, patch_h, patch_w, return_feature=True)
+            out = F.interpolate(out, (patch_h * 14, patch_w * 14), mode='bilinear', align_corners=True)
+            feat = F.interpolate(feat, (patch_h * 14, patch_w * 14), mode='bilinear', align_corners=True)
+            return out, feat
         
         out = self.head(features, patch_h, patch_w)
         out = F.interpolate(out, (patch_h * 14, patch_w * 14), mode='bilinear', align_corners=True)

@@ -2,7 +2,8 @@ import torch
 import torch.nn.functional as F
 
 class PrototypeBank:
-    def __init__(self, num_classes=2, feat_dim=256, queue_size=1000, device='cuda'):
+    def __init__(self, num_classes=2, power=2, feat_dim=256, queue_size=1000, device='cuda'):
+        self.power = power
         self.num_classes = num_classes
         self.feat_dim = feat_dim
         self.queue_size = queue_size
@@ -78,4 +79,4 @@ class PrototypeBank:
         
         weight_map = torch.gather(max_sim_large, 1, pseudo_labels.unsqueeze(1)).squeeze(1)
         
-        return torch.relu(weight_map).detach()
+        return torch.relu(weight_map).pow(self.power).detach()

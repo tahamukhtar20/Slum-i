@@ -2,24 +2,43 @@ import numpy as np
 import logging
 import os
 
+import torch
 
-class InfiniteDataLoader:
-    def __init__(self, dataloader):
-        self.dataloader = dataloader
-        self.iterator = iter(self.dataloader)
 
-    def __iter__(self):
-        return self
+class ClassAwareThreshold:
+    def __init__(self, num_classes, momentum=0.9, min_thresh=0.5, max_thresh=0.95):
+        self.num_classes = num_classes
+        self.momentum = momentum
+        self.min_thresh = min_thresh
+        self.max_thresh = max_thresh
+        self.class_conf_avg = torch.ones(num_classes).cuda() * max_thresh
 
-    def __next__(self):
-        try:
-            return next(self.iterator)
-        except StopIteration:
-            self.iterator = iter(self.dataloader)
-            return next(self.iterator)
+    def update(self, conf_map, pred_map):
+        """
+        conf_map: (B, H, W) - Confidence (probability) of the predicted class
+        pred_map: (B, H, W) - Predicted class indices
+        """
+        current_class_conf = torch.zeros(self.num_classes).cuda()
+        
+        for c in range(self.num_classes):
+            mask_c = (pred_map == c)
+            if mask_c.sum() > 0:
+                mean_conf = conf_map[mask_c].mean()
+                current_class_conf[c] = mean_conf
+            else:
+                current_class_conf[c] = self.class_conf_avg[c]
 
-    def __len__(self):
-        return len(self.dataloader)
+        self.class_conf_avg = self.momentum * self.class_conf_avg + (1 - self.momentum) * current_class_conf
+
+    def get_mask(self, conf_map, pred_map):
+        """
+        Returns a mask where True indicates the confidence is high enough relative to the class difficulty.
+        """
+        thresholds = self.class_conf_avg[pred_map]
+        
+        thresholds = torch.clamp(thresholds, self.min_thresh, self.max_thresh)
+        
+        return conf_map > thresholds
 
 
 def entropy_meaning_loss(logits, pseudo_labels, mask_ratio):
@@ -133,7 +152,6 @@ class AverageMeter(object):
 
     def update(self, val, num=1):
         if self.length > 0:
-            # currently assert num==1 to avoid bad usage, refine when there are some explict requirements
             assert num == 1
             self.history.append(val)
             if len(self.history) > self.length:
@@ -149,7 +167,6 @@ class AverageMeter(object):
 
 
 def intersectionAndUnion(output, target, K, ignore_index=255):
-    # 'K' classes, output and target sizes are N or N * L or N * H * W, each value in range 0 to K - 1.
     assert output.ndim in [1, 2, 3]
     assert output.shape == target.shape
     output = output.reshape(output.size).copy()

@@ -12,13 +12,21 @@ case "$method" in
         is_semi=false
         [[ "$method" == *"dino"* ]] && config_prefix="configs/dino/benchmark" || config_prefix="configs/deeplab/benchmark"
         ;;
-    fixmatch|unimatch|ours)
+    fixmatch|unimatch|ours|ours_no_sat|ours_no_proto|ours_no_neg|ours_sat_only|ours_neg_only|ours_proto_only)
         is_semi=true
-        [[ "$method" == "ours" ]] && config_prefix="configs/deeplab/ours" || config_prefix="configs/deeplab/benchmark"
+        if [[ "$method" == *"ours"* ]]; then
+            config_prefix="configs/deeplab/ours"
+        else
+            config_prefix="configs/deeplab/benchmark"
+        fi
         ;;
     unimatchv2|ours-dino)
         is_semi=true
-        [[ "$method" == "ours-dino" ]] && config_prefix="configs/dino/ours" || config_prefix="configs/dino/benchmark"
+        if [[ "$method" == *"ours-dino"* ]]; then
+             config_prefix="configs/dino/ours"
+        else
+             config_prefix="configs/dino/benchmark"
+        fi
         ;;
     *)
         echo "Error: Unknown method: $method"
@@ -26,8 +34,17 @@ case "$method" in
         ;;
 esac
 
+echo "Running Method: $method"
+echo "Config Prefix: $config_prefix"
+
 for dataset in "${datasets[@]}"; do
     config="${config_prefix}/${dataset}.yaml"
+    
+    if [[ ! -f "$config" ]]; then
+        echo "Config file not found: $config"
+        continue
+    fi
+
     if [[ "$is_semi" == true ]]; then
         for split in "${splits[@]}"; do
             labeled_id_path="splits/${dataset}/${split}/labeled.txt"
