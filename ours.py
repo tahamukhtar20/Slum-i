@@ -24,7 +24,7 @@ parser.add_argument('--config', type=str, required=True)
 parser.add_argument('--labeled-id-path', type=str, required=True)
 parser.add_argument('--unlabeled-id-path', type=str, required=True)
 parser.add_argument('--save-path', type=str, required=True)
-parser.add_argument('--results-dir', type=str, default='./tmp/results')
+parser.add_argument('--results-dir', type=str, default='./results')
 parser.add_argument('--split', type=str, default='10')
 
 def main():
