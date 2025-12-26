@@ -1,1 +1,1 @@
-### name tbd -- repo based on unimatch, with negative learning and prototype centroids
+### slum-i
