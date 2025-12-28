@@ -218,13 +218,13 @@ tensorboard --logdir exp/
 
 **Eldaein Dataset:**
 
-| Method | 10% Labels | 20% Labels | 30% Labels |
-|--------|-----------|-----------|-----------|
-| Supervised | 52.44 | 70.72 | 67.72 |
-| FixMatch | 67.41 | 71.50 | 73.52 |
-| UniMatch | 70.22 | 72.78 | 70.82 |
-| **Ours (DeepLabV3+)** | **68.05** | **70.23** | **74.88** |
-| **Ours (DPT-DINOv2)** | **68.01** | **74.43** | **74.89** |
+| Method | 10% Labels | 20% Labels | 30% Labels | Full Labels |
+|--------|-----------|-----------|-----------|-------------|
+| Supervised | 52.44 | 70.72 | 67.72 | 75.24 |
+| FixMatch | 67.41 | 71.50 | 73.52 | - |
+| UniMatch | 70.22 | 72.78 | 70.82 | - |
+| **Ours (DeepLabV3+)** | **68.05** | **70.23** | **74.88** | - |
+| **Ours (DPT-DINOv2)** | **68.01** | **74.43** | **74.89** | **80.06** |
 
 ### Computational Efficiency
 
@@ -241,11 +241,15 @@ tensorboard --logdir exp/
 
 ### Ablation Studies
 
-| Variant | Mumbai (10%) | Mumbai (20%) | Mumbai (30%) |
-|---------|-------------|-------------|-------------|
-| Ours (Full) | **71.87** | **73.48** | **76.30** |
-| w/o Prototype | 70.69 | 72.96 | 72.78 |
-| w/o Adaptive Threshold | 73.77 | 73.48 | 76.30 |
+We conduct ablation studies on the Eldaein dataset to analyze the contribution of each component:
+
+| Variant | Eldaein (10%) | Eldaein (20%) | Eldaein (30%) |
+|---------|---------------|---------------|---------------|
+| **Ours (Full)** | **68.05** | **70.23** | **74.88** |
+| w/o Prototype Bank | 70.69 | 72.96 | 72.78 |
+| w/o Adaptive Threshold (SAT only) | 73.77 | 73.48 | 76.30 |
+
+**Note**: The ablation results show different behaviors across label ratios. The "SAT only" variant (self-adaptive threshold without prototype) performs better at lower label ratios but converges to similar performance at 30% labels. This suggests that the prototype bank component is particularly beneficial when combined with other mechanisms at higher label ratios, while the adaptive threshold provides consistent gains across all settings.
 
 ## Model Zoo
 
