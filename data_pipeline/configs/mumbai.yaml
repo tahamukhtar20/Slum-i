@@ -1,0 +1,33 @@
+city: mumbai
+kml_path: ${SLUM_I_ROOT}/data_pipeline/kmls/mumbai.kml
+output_dir: ${SLUM_I_ROOT}/data_pipeline/datasets/mumbai
+seed: 42
+
+zoom: 18
+patch_size: 512
+buffer_m: 50
+label_field: null
+all_touched: false
+
+quadtree:
+  min_size_m: 500
+
+tiles:
+  source: esri_satellite
+  policy: strict
+  max_connections: 16
+  max_failed_ratio: 0.05
+  strip_rows: 4
+
+sampler:
+  max_empty_ratio: 0.95
+  min_label_ratio: 0.0
+  edge_strategy: drop
+  pad_mode: zero
+  mode: grid
+
+split:
+  strategy: patch_level
+  test_ratio: 0.15
+  val_ratio: 0.10
+  labeled_ratios: [0.10, 0.20, 0.30]

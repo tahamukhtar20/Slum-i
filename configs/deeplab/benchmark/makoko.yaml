@@ -1,0 +1,15 @@
+dataset: makoko
+nclass: 2
+crop_size: 512
+data_root: "${DATA_ROOT}/makoko"
+
+epochs: 80
+batch_size: 8
+lr: 0.02
+lr_multi: 1.0
+conf_thresh: 0.95
+
+model: deeplabv3plus
+backbone: resnet101
+replace_stride_with_dilation: [False, False, True]
+dilations: [6, 12, 18]

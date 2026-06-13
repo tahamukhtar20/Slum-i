@@ -1,0 +1,91 @@
+## Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+## PyTorch / ML
+*.pth
+*.pt
+*.onnx
+*tfevents*
+
+## Data and outputs (all large, cluster-only)
+archive/
+logs/
+tmp/
+results/
+sweeps/
+
+## Secrets
+.env
+.env.*
+wandb/
+
+## Editor
+.vscode/
+.idea/
+*.swp
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Run artifacts (cluster-only, do not track)
+exp*
+sweeps/
+
+## Analysis outputs (regenerable)
+references/
+.cursor/
+
+## Public release — selective overrides
+
+# Data: exclude images/masks/manifests; splits/*.txt are tracked explicitly
+data_pipeline/datasets/*/Images/
+data_pipeline/datasets/*/Masks/
+data_pipeline/datasets/*/manifest.json
+data_pipeline/datasets/*/clusters.json
+
+# KML — keep only Lahore (user-created); exclude third-party sources
+data_pipeline/kmls/
+!data_pipeline/kmls/lahore.kml
+
+# Dev artifacts
+*.bak
+dev_json_results.csv
+all_collected_results.csv
+scratch/
+
+# Analysis intermediate outputs (bak files, dev variants)
+analysis/v2/metrics.csv.bak
+analysis/v2/make_figure.py.bak
+analysis/v2/compute_metrics.py.bak
+analysis/v2/fig_ellipse_sample.png
+analysis/v2/fig_v1_lineonly.png
+analysis/v2/fig_v2_nonempty.png
+analysis/v2/fig_v3_sqrt.png
+
+
+# Internal scripts — not for release
+scripts/collect_benchmark.py
+scripts/collect_all_results.py
+scripts/collect_dino.py
+scripts/rerun.py
+scripts/gen_gate6_sweep.py
+scripts/gate_compare.py
+scripts/print_table.py
+scripts/build_final_csv.py
+scripts/precompute_clusters.py
+scripts/compute_tiles.sh
+all_results_raw.csv
+scripts/embedding_analysis.py
+
+all_results_agg.csv
+benchmark_results.csv
