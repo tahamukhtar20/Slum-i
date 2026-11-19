@@ -1,0 +1,23 @@
+region:
+  path: "region_buf250.geojson"
+imagery:
+  type: "xyz"
+  zoom: 18
+  source: "esri_satellite"
+  max_connections: 4
+labels:
+  path: "labels.geojson"
+sampler:
+  patch_size: 512
+  edge_strategy: "drop"
+  max_empty_ratio: 0.05
+writer:
+  staging_dir: "../../tiles/lahore_esri_z18"
+  image_format: "png"
+split:
+  strategy: "spatial"
+  test_ratio: 0.15
+  val_ratio: 0.1
+  labeled_ratios: [0.1, 0.2, 0.3]
+  seed: 42
+  block_size: 2048

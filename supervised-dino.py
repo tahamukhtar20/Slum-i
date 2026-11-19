@@ -19,6 +19,7 @@ from supervised import evaluate, init_seeds, seed_worker, test
 from util.utils import init_log, AverageMeter, load_config
 
 from thop import profile
+from util.multispectral import widen_first_conv
 
 parser = argparse.ArgumentParser(description='Semi-Supervised Semantic Segmentation for Slum Detection')
 parser.add_argument('--config', type=str, required=True)
@@ -71,6 +72,7 @@ def main():
     
     state_dict = torch.load(f'./pretrained/{cfg["backbone"]}.pth')
     model.backbone.load_state_dict(state_dict)
+    widen_first_conv(model, cfg.get('in_chans', 3))
       
     if cfg['lock_backbone']:
         model.lock_backbone()
@@ -82,7 +84,7 @@ def main():
     model.cuda(local_rank)
     
     model.eval()
-    C, H, W = 3, cfg['crop_size'], cfg['crop_size']
+    C, H, W = cfg.get('in_chans', 3), cfg['crop_size'], cfg['crop_size']
     dummy_input = torch.randn(1, C, H, W).cuda(local_rank)
     
     temp_model = copy.deepcopy(model)

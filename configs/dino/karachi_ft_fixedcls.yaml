@@ -1,0 +1,16 @@
+dataset: karachi
+nclass: 2
+crop_size: 518
+data_root: "data/tiles/karachi_esri_z18_f"
+
+epochs: 60
+batch_size: 8
+lr: 0.000005
+lr_multi: 40.0
+conf_thresh: 0.95
+
+model: dpt
+backbone: dinov2_small
+lock_backbone: False
+pl_scheme: fixed_class
+class_thresh: [0.87, 0.74]

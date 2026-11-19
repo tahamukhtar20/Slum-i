@@ -1,0 +1,65 @@
+\documentclass{article}\usepackage[a4paper,landscape,margin=1cm]{geometry}
+\usepackage{amsmath,amsfonts}\usepackage{array}\usepackage{stfloats}\usepackage{tabularx}\usepackage{booktabs}\usepackage{colortbl}
+\pagestyle{empty}
+\begin{document}
+\begin{table*}[!t]
+\caption{Test Results (mIoU and Slum IoU, \%, Mean and Standard Deviation over Five Seeds)}
+\label{tab:results}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\begin{tabularx}{\textwidth}{@{}l*{12}{>{\centering\arraybackslash}X}@{}}
+\toprule
+ & \multicolumn{4}{c}{\textbf{Lahore}} & \multicolumn{4}{c}{\textbf{Karachi}} & \multicolumn{4}{c}{\textbf{Mumbai}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}\cmidrule(l){10-13}
+ & \multicolumn{2}{c}{Esri} & \multicolumn{2}{c}{Sentinel-2} & \multicolumn{2}{c}{Esri} & \multicolumn{2}{c}{Sentinel-2} & \multicolumn{2}{c}{Esri} & \multicolumn{2}{c}{Sentinel-2} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(l){12-13}
+Method & mIoU & Slum & mIoU & Slum & mIoU & Slum & mIoU & Slum & mIoU & Slum & mIoU & Slum \\
+\midrule
+\multicolumn{13}{c}{10\% labels} \\
+\cmidrule{1-13}
+Supervised (R101) & $52.9_{\pm4.6}$ & $28.0_{\pm8.3}$ & $53.7_{\pm4.2}$ & $32.6_{\pm6.4}$ & $\underline{53.3}_{\pm2.1}$ & $27.0_{\pm3.3}$ & $\mathbf{47.9}_{\pm2.1}$ & $\mathbf{18.4}_{\pm3.3}$ & $78.7_{\pm0.1}$ & $62.8_{\pm0.2}$ & $\underline{75.3}_{\pm0.5}$ & $\underline{56.8}_{\pm1.1}$ \\
+FixMatch & $64.7_{\pm4.0}$ & $48.3_{\pm6.4}$ & $55.9_{\pm3.1}$ & $34.0_{\pm5.0}$ & $48.0_{\pm3.5}$ & $22.0_{\pm12.7}$ & $40.8_{\pm0.1}$ & $0.1_{\pm0.1}$ & $79.0_{\pm0.7}$ & $63.5_{\pm1.1}$ & $74.4_{\pm0.6}$ & $55.1_{\pm1.2}$ \\
+Ours (FixMatch) & $\mathbf{69.5}_{\pm1.8}$ & $\mathbf{56.2}_{\pm2.5}$ & $\underline{63.5}_{\pm2.5}$ & $\mathbf{52.1}_{\pm2.8}$ & $51.9_{\pm4.9}$ & $\underline{32.6}_{\pm4.7}$ & $28.5_{\pm11.6}$ & $13.4_{\pm11.2}$ & $79.2_{\pm0.5}$ & $\underline{64.2}_{\pm0.7}$ & $71.9_{\pm1.9}$ & $52.4_{\pm2.8}$ \\
+UniMatch & $64.7_{\pm3.3}$ & $48.4_{\pm5.5}$ & $61.7_{\pm2.6}$ & $45.3_{\pm4.4}$ & $\mathbf{53.6}_{\pm1.6}$ & $31.2_{\pm2.0}$ & $45.5_{\pm1.7}$ & $13.3_{\pm3.7}$ & $\underline{79.3}_{\pm0.2}$ & $63.9_{\pm0.4}$ & $75.2_{\pm1.4}$ & $56.7_{\pm2.5}$ \\
+Ours (UniMatch) & $\underline{67.1}_{\pm1.2}$ & $\underline{52.5}_{\pm1.8}$ & $\mathbf{64.0}_{\pm2.9}$ & $\underline{49.0}_{\pm4.6}$ & $51.5_{\pm4.6}$ & $\mathbf{32.8}_{\pm3.8}$ & $\underline{46.5}_{\pm2.0}$ & $\underline{16.2}_{\pm5.6}$ & $\mathbf{79.5}_{\pm0.1}$ & $\mathbf{64.4}_{\pm0.2}$ & $\mathbf{75.9}_{\pm1.2}$ & $\mathbf{57.9}_{\pm2.1}$ \\
+\arrayrulecolor[gray]{0.65}\cmidrule[0.3pt]{1-13}\arrayrulecolor{black}
+Supervised (DINOv2) & $\underline{64.0}_{\pm0.9}$ & $\underline{46.5}_{\pm1.4}$ & $58.4_{\pm3.1}$ & $40.3_{\pm4.7}$ & $61.2_{\pm2.2}$ & $37.5_{\pm3.8}$ & $\underline{49.8}_{\pm1.0}$ & $20.0_{\pm1.6}$ & $79.4_{\pm0.3}$ & $64.0_{\pm0.6}$ & $76.4_{\pm0.2}$ & $58.8_{\pm0.4}$ \\
+UniMatch V2 & $61.1_{\pm2.0}$ & $41.8_{\pm2.9}$ & $\underline{65.3}_{\pm2.7}$ & $\underline{50.6}_{\pm4.3}$ & $\underline{65.8}_{\pm1.2}$ & $\underline{45.6}_{\pm1.9}$ & $49.5_{\pm1.7}$ & $\underline{20.0}_{\pm2.9}$ & $\mathbf{80.9}_{\pm0.2}$ & $\mathbf{66.6}_{\pm0.3}$ & $\underline{78.0}_{\pm0.4}$ & $\underline{61.6}_{\pm0.7}$ \\
+Ours (UniMatch V2) & $\mathbf{65.9}_{\pm2.2}$ & $\mathbf{50.7}_{\pm3.3}$ & $\mathbf{65.7}_{\pm2.0}$ & $\mathbf{53.5}_{\pm2.9}$ & $\mathbf{67.9}_{\pm1.5}$ & $\mathbf{49.9}_{\pm2.8}$ & $\mathbf{51.6}_{\pm2.7}$ & $\mathbf{23.8}_{\pm5.7}$ & $\underline{80.8}_{\pm0.6}$ & $\underline{66.6}_{\pm0.9}$ & $\mathbf{78.0}_{\pm0.1}$ & $\mathbf{61.9}_{\pm0.3}$ \\
+\midrule
+\multicolumn{13}{c}{20\% labels} \\
+\cmidrule{1-13}
+Supervised (R101) & $58.8_{\pm5.8}$ & $38.0_{\pm9.9}$ & $56.4_{\pm2.9}$ & $35.8_{\pm5.2}$ & $60.2_{\pm0.9}$ & $37.5_{\pm1.7}$ & $\mathbf{50.7}_{\pm1.2}$ & $24.6_{\pm2.5}$ & $79.1_{\pm0.1}$ & $63.4_{\pm0.2}$ & $75.5_{\pm0.7}$ & $57.1_{\pm1.2}$ \\
+FixMatch & $70.0_{\pm0.6}$ & $56.0_{\pm1.0}$ & $56.6_{\pm4.7}$ & $35.2_{\pm7.9}$ & $62.6_{\pm3.6}$ & $43.5_{\pm6.7}$ & $41.3_{\pm0.9}$ & $1.3_{\pm1.5}$ & $\underline{80.4}_{\pm0.5}$ & $65.8_{\pm0.7}$ & $75.7_{\pm0.9}$ & $57.4_{\pm1.7}$ \\
+Ours (FixMatch) & $\mathbf{71.1}_{\pm2.5}$ & $\mathbf{58.3}_{\pm3.9}$ & $\mathbf{64.2}_{\pm0.7}$ & $\mathbf{49.5}_{\pm1.4}$ & $60.3_{\pm3.8}$ & $44.2_{\pm3.6}$ & $42.2_{\pm6.2}$ & $\mathbf{28.4}_{\pm3.0}$ & $\mathbf{80.7}_{\pm0.4}$ & $\mathbf{66.4}_{\pm0.7}$ & $75.6_{\pm1.0}$ & $57.7_{\pm1.6}$ \\
+UniMatch & $\underline{70.2}_{\pm2.1}$ & $\underline{56.6}_{\pm3.2}$ & $60.9_{\pm4.3}$ & $43.2_{\pm6.5}$ & $\underline{63.8}_{\pm3.3}$ & $\underline{45.6}_{\pm4.5}$ & $49.5_{\pm2.3}$ & $22.1_{\pm5.3}$ & $80.2_{\pm0.1}$ & $65.5_{\pm0.2}$ & $\underline{75.7}_{\pm0.7}$ & $\underline{57.8}_{\pm1.3}$ \\
+Ours (UniMatch) & $69.1_{\pm1.1}$ & $54.9_{\pm1.8}$ & $\underline{62.9}_{\pm1.1}$ & $\underline{46.8}_{\pm1.8}$ & $\mathbf{65.2}_{\pm3.2}$ & $\mathbf{48.5}_{\pm3.3}$ & $\underline{50.6}_{\pm1.5}$ & $\underline{26.1}_{\pm4.3}$ & $80.4_{\pm0.1}$ & $\underline{65.9}_{\pm0.2}$ & $\mathbf{76.5}_{\pm0.7}$ & $\mathbf{59.1}_{\pm1.2}$ \\
+\arrayrulecolor[gray]{0.65}\cmidrule[0.3pt]{1-13}\arrayrulecolor{black}
+Supervised (DINOv2) & $67.0_{\pm1.3}$ & $51.1_{\pm2.0}$ & $62.4_{\pm1.6}$ & $45.2_{\pm2.2}$ & $68.6_{\pm0.5}$ & $51.1_{\pm0.9}$ & $54.5_{\pm2.6}$ & $28.7_{\pm3.9}$ & $80.5_{\pm0.3}$ & $65.9_{\pm0.5}$ & $77.3_{\pm0.5}$ & $60.4_{\pm0.9}$ \\
+UniMatch V2 & $\underline{67.6}_{\pm2.7}$ & $\underline{51.8}_{\pm4.2}$ & $\underline{64.6}_{\pm1.2}$ & $\underline{48.6}_{\pm2.4}$ & $\underline{69.3}_{\pm1.1}$ & $\underline{52.5}_{\pm1.6}$ & $\mathbf{58.4}_{\pm1.5}$ & $\mathbf{35.6}_{\pm2.1}$ & $\mathbf{81.5}_{\pm0.3}$ & $\underline{67.7}_{\pm0.6}$ & $\underline{78.4}_{\pm0.2}$ & $\underline{62.3}_{\pm0.4}$ \\
+Ours (UniMatch V2) & $\mathbf{71.4}_{\pm2.5}$ & $\mathbf{58.5}_{\pm3.9}$ & $\mathbf{66.1}_{\pm1.3}$ & $\mathbf{52.4}_{\pm1.5}$ & $\mathbf{69.4}_{\pm0.8}$ & $\mathbf{53.1}_{\pm1.1}$ & $\underline{56.1}_{\pm3.0}$ & $\underline{31.9}_{\pm6.4}$ & $\underline{81.5}_{\pm0.1}$ & $\mathbf{67.7}_{\pm0.2}$ & $\mathbf{78.8}_{\pm0.4}$ & $\mathbf{63.0}_{\pm0.7}$ \\
+\midrule
+\multicolumn{13}{c}{30\% labels} \\
+\cmidrule{1-13}
+Supervised (R101) & $62.7_{\pm1.6}$ & $44.3_{\pm2.8}$ & $59.4_{\pm3.6}$ & $40.7_{\pm5.6}$ & $59.6_{\pm1.3}$ & $35.6_{\pm2.5}$ & $\mathbf{52.4}_{\pm3.0}$ & $26.9_{\pm5.4}$ & $79.7_{\pm0.5}$ & $64.5_{\pm1.0}$ & $76.4_{\pm0.5}$ & $58.8_{\pm1.0}$ \\
+FixMatch & $\underline{71.7}_{\pm2.1}$ & $\underline{58.5}_{\pm3.5}$ & $61.1_{\pm1.7}$ & $42.7_{\pm2.8}$ & $63.0_{\pm2.4}$ & $41.1_{\pm3.8}$ & $45.2_{\pm3.6}$ & $10.3_{\pm8.4}$ & $80.8_{\pm0.4}$ & $66.4_{\pm0.8}$ & $76.1_{\pm0.7}$ & $58.0_{\pm1.2}$ \\
+Ours (FixMatch) & $\mathbf{72.3}_{\pm1.6}$ & $\mathbf{59.8}_{\pm2.3}$ & $\mathbf{63.5}_{\pm2.2}$ & $\mathbf{48.7}_{\pm2.7}$ & $\mathbf{66.0}_{\pm1.5}$ & $\mathbf{49.0}_{\pm1.9}$ & $51.7_{\pm1.8}$ & $\mathbf{33.2}_{\pm1.5}$ & $\mathbf{81.2}_{\pm0.3}$ & $\mathbf{67.3}_{\pm0.5}$ & $76.5_{\pm0.7}$ & $58.9_{\pm1.2}$ \\
+UniMatch & $71.3_{\pm1.9}$ & $58.1_{\pm3.0}$ & $61.6_{\pm1.8}$ & $43.9_{\pm3.1}$ & $63.6_{\pm2.5}$ & $44.2_{\pm4.0}$ & $51.4_{\pm3.1}$ & $24.6_{\pm6.1}$ & $80.7_{\pm0.2}$ & $66.2_{\pm0.4}$ & $\underline{76.7}_{\pm0.6}$ & $\underline{59.2}_{\pm1.1}$ \\
+Ours (UniMatch) & $69.5_{\pm2.8}$ & $55.1_{\pm4.4}$ & $\underline{62.2}_{\pm1.6}$ & $\underline{44.8}_{\pm2.9}$ & $\underline{64.4}_{\pm3.1}$ & $\underline{45.1}_{\pm5.2}$ & $\underline{51.9}_{\pm2.7}$ & $\underline{27.2}_{\pm4.9}$ & $\underline{81.0}_{\pm0.1}$ & $\underline{66.9}_{\pm0.1}$ & $\mathbf{76.8}_{\pm0.2}$ & $\mathbf{59.5}_{\pm0.4}$ \\
+\arrayrulecolor[gray]{0.65}\cmidrule[0.3pt]{1-13}\arrayrulecolor{black}
+Supervised (DINOv2) & $\underline{67.2}_{\pm1.7}$ & $\underline{51.3}_{\pm2.5}$ & $59.9_{\pm1.8}$ & $40.6_{\pm2.9}$ & $67.4_{\pm1.9}$ & $48.6_{\pm3.0}$ & $54.5_{\pm2.1}$ & $28.5_{\pm3.3}$ & $81.0_{\pm0.1}$ & $66.8_{\pm0.2}$ & $78.1_{\pm0.6}$ & $61.7_{\pm1.0}$ \\
+UniMatch V2 & $67.1_{\pm1.3}$ & $51.2_{\pm1.9}$ & $\underline{66.7}_{\pm2.5}$ & $\underline{51.6}_{\pm4.1}$ & $\underline{67.9}_{\pm1.8}$ & $\underline{49.3}_{\pm2.7}$ & $\underline{57.2}_{\pm3.0}$ & $\underline{33.0}_{\pm5.4}$ & $\underline{81.6}_{\pm0.3}$ & $\underline{67.8}_{\pm0.5}$ & $\underline{78.9}_{\pm0.3}$ & $\underline{63.2}_{\pm0.5}$ \\
+Ours (UniMatch V2) & $\mathbf{70.0}_{\pm1.5}$ & $\mathbf{55.9}_{\pm2.3}$ & $\mathbf{67.1}_{\pm1.5}$ & $\mathbf{53.4}_{\pm2.4}$ & $\mathbf{67.9}_{\pm1.0}$ & $\mathbf{49.8}_{\pm1.2}$ & $\mathbf{57.4}_{\pm2.2}$ & $\mathbf{33.6}_{\pm3.7}$ & $\mathbf{81.8}_{\pm0.3}$ & $\mathbf{68.2}_{\pm0.6}$ & $\mathbf{79.1}_{\pm0.2}$ & $\mathbf{63.6}_{\pm0.3}$ \\
+\midrule
+\multicolumn{13}{c}{100\% labels} \\
+\cmidrule{1-13}
+Supervised (R101) & $70.9_{\pm1.2}$ & $56.8_{\pm2.2}$ & $63.3_{\pm1.1}$ & $47.2_{\pm1.7}$ & $63.1_{\pm1.0}$ & $41.2_{\pm1.8}$ & $52.2_{\pm3.2}$ & $26.9_{\pm5.3}$ & $81.5_{\pm0.2}$ & $67.6_{\pm0.4}$ & $77.7_{\pm0.5}$ & $61.0_{\pm1.0}$ \\
+\arrayrulecolor[gray]{0.65}\cmidrule[0.3pt]{1-13}\arrayrulecolor{black}
+Supervised (DINOv2) & $71.7_{\pm0.7}$ & $58.6_{\pm1.3}$ & $69.1_{\pm0.4}$ & $55.2_{\pm0.6}$ & $67.8_{\pm1.6}$ & $49.6_{\pm2.4}$ & $59.3_{\pm2.6}$ & $36.7_{\pm4.5}$ & $82.1_{\pm0.3}$ & $68.8_{\pm0.5}$ & $78.9_{\pm0.2}$ & $63.2_{\pm0.4}$ \\
+\bottomrule\addlinespace[2pt]
+\multicolumn{13}{@{}l}{Bold marks the best value in each backbone block and underline the second best.} \\
+\end{tabularx}
+\end{table*}
+\null
+\end{document}

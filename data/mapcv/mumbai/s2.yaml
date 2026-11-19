@@ -1,0 +1,24 @@
+region:
+  path: "region_s2.geojson"
+imagery:
+  type: "geotiff"
+  path: "s2/mumbai_s2.tif"
+  nodata: 0
+labels:
+  path: "labels.geojson"
+sampler:
+  patch_size: 256
+  edge_strategy: "pad"
+  pad_mode: "zero"
+  max_empty_ratio: 1.0
+writer:
+  staging_dir: "../../tiles/mumbai_s2_raw"
+  image_format: "tif"
+  mask_format: "tif"
+split:
+  strategy: "spatial"
+  test_ratio: 0.15
+  val_ratio: 0.1
+  labeled_ratios: [0.1, 0.2, 0.3]
+  seed: 42
+  block_size: 2048

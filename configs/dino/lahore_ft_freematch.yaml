@@ -1,0 +1,15 @@
+dataset: lahore
+nclass: 2
+crop_size: 518
+data_root: "data/tiles/lahore_esri_z18"
+
+epochs: 60
+batch_size: 8
+lr: 0.000005
+lr_multi: 40.0
+conf_thresh: 0.95
+
+model: dpt
+backbone: dinov2_small
+lock_backbone: False
+pl_scheme: freematch

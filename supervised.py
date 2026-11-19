@@ -20,6 +20,7 @@ from model.semseg.deeplabv3plus import DeepLabV3Plus
 from util.utils import init_log, AverageMeter, intersectionAndUnion, load_config
 
 from thop import profile
+from util.multispectral import widen_first_conv
 
 parser = argparse.ArgumentParser(description='Supervised Semantic Segmentation for Slum Detection')
 parser.add_argument('--config', type=str, required=True)
@@ -103,8 +104,9 @@ def evaluate(model, loader, cfg, calculate_speed=False, multiplier=None):
             intersection_meter.update(intersection)
             union_meter.update(union)
             
-            correct_pixel.update((pred.cpu() == mask).sum().item())
-            total_pixel.update(pred.numel())
+            valid = mask != 255
+            correct_pixel.update(((pred.cpu() == mask) & valid).sum().item())
+            total_pixel.update(max(valid.sum().item(), 1))
             
     iou_class = intersection_meter.sum / (union_meter.sum + 1e-10) * 100.0
     overall_acc = correct_pixel.sum / total_pixel.sum * 100.0
@@ -230,8 +232,9 @@ def main():
     os.makedirs(args.save_path, exist_ok=True)
 
     model = DeepLabV3Plus(cfg)
+    widen_first_conv(model, cfg.get('in_chans', 3))
     
-    C, H, W = 3, cfg['crop_size'], cfg['crop_size']
+    C, H, W = cfg.get('in_chans', 3), cfg['crop_size'], cfg['crop_size']
     dummy_input = torch.randn(1, C, H, W).cuda(local_rank)
     model.cuda(local_rank)
     
