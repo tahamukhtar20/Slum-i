@@ -41,7 +41,7 @@ Esri imagery, 10% labels, UniMatch V2. Each row is paired by seed with the UniMa
 | `softmatch` | SoftMatch (class-wise, without uniform alignment) | `configs/dino/<city>_ft_softmatch.yaml` |
 | `cdmad` | CDMAD | `configs/dino/<city>_ft_cdmad.yaml` |
 | `unimatchv2_freematchc` | Ours (from Table II) | `configs/dino/<city>_ft_freematchc.yaml` |
-| `satglobal` | Ours, global term only | `configs/dino/<city>_ft_satglobal.yaml` |
+| `satglobal` | Ours, global threshold only | `configs/dino/<city>_ft_satglobal.yaml` |
 | `fixedcls` | Ours, fixed class thresholds | `configs/dino/<city>_ft_fixedcls.yaml` |
 
 The paper reports all five seeds (0, 42, 123, 999, 1337), the default. `--seeds` selects a subset.

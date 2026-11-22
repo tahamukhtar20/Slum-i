@@ -10,7 +10,7 @@ from statistics import mean
 
 ROWS = [("DWL ranking", "unimatchv2_rank"), ("FreeMatch", "freematch"), ("SoftMatch", "softmatch"),
         ("CDMAD", "cdmad"), ("Ours", "unimatchv2_freematchc"),
-        ("Ours, global term only", "satglobal"), ("Ours, fixed class thresholds", "fixedcls")]
+        ("Ours, global threshold only", "satglobal"), ("Ours, fixed class thresholds", "fixedcls")]
 CITIES = ["lahore", "karachi", "mumbai"]
 
 ap = argparse.ArgumentParser()
