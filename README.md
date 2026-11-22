@@ -104,7 +104,7 @@ keys that select a pseudo-label scheme are:
 | fixed threshold (FixMatch, UniMatch, UniMatch V2) | `conf_thresh: 0.95` |
 | ours | `pl_scheme: freematch`, `sat_local: conf` |
 | FreeMatch (without its fairness loss) | `pl_scheme: freematch` |
-| SoftMatch | `pl_scheme: softmatch` |
+| SoftMatch (class-wise, without uniform alignment) | `pl_scheme: softmatch` |
 | CDMAD | `cdmad: True`, `conf_thresh: 0.0` |
 | DWL ranking | `rank_weight: True`, `rank_floor: 0.3` |
 | ours, global term only | `pl_scheme: freematch`, `sat_local: none` |
