@@ -3,7 +3,9 @@
 Writes labels.geojson (one feature per polygon, class "slum"), region_buf250.geojson (the polygons
 buffered by 250 m and dissolved) and, when a polygon is larger than 500 ha, annotated_area.geojson
 (the region without those polygons, so their pixels get the ignore value). Only Karachi has such
-polygons (four).
+polygons (four, of 103, 62, 20 and 9 km2 with 20 to 60 vertices each). They are coarse outlines of
+whole districts rather than settlement outlines and hold 91% of Karachi's label area, so they are
+ignored instead of being counted as slum.
 
 Usage: python scripts/data/make_labels.py <city> <polygons.kml>
 """
